@@ -12,7 +12,20 @@ export type Position = {
   changeType: ChangeType;
 };
 
-export const portfolioSnapshot = {
+export type PortfolioSnapshot = {
+  manager: string;
+  managerShort: string;
+  cik: string;
+  reportDate: string;
+  filedAt: string;
+  source: string;
+  totalValue: number;
+  positionCount: number;
+  changes: Record<ChangeType, number>;
+  positions: Position[];
+};
+
+export const portfolioSnapshot: PortfolioSnapshot = {
   manager: "Berkshire Hathaway",
   managerShort: "伯克希尔·哈撒韦",
   cik: "0001067983",
@@ -33,5 +46,5 @@ export const portfolioSnapshot = {
     { issuer: "T-Mobile US", ticker: "TMUS", sector: "通信", value: 2.96, weight: 1.11, shares: 12750000, shareChange: -1150000, changePercent: -8.27, changeType: "REDUCED" },
     { issuer: "Domino's Pizza", ticker: "DPZ", sector: "消费", value: 1.21, weight: 0.45, shares: 2450000, shareChange: 320000, changePercent: 15.02, changeType: "ADDED" },
     { issuer: "Ulta Beauty", ticker: "ULTA", sector: "消费", value: 0, weight: 0, shares: 0, shareChange: -690106, changePercent: -100, changeType: "EXIT" },
-  ] satisfies Position[],
+  ],
 };
