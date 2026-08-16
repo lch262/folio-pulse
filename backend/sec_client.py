@@ -7,6 +7,7 @@ import json
 from typing import Any, Callable, Mapping
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+import xml.etree.ElementTree as ET
 
 
 SUBMISSIONS_BASE_URL = "https://data.sec.gov/submissions"
@@ -27,6 +28,10 @@ class SecRequestError(SecClientError):
 
 class SecResponseError(SecClientError):
     """Raised when an SEC response is malformed."""
+
+
+class InformationTableNotFoundError(SecResponseError):
+    """Raised when a filing has no discoverable Information Table XML."""
 
 
 def normalize_cik(cik: str | int) -> str:
@@ -97,6 +102,16 @@ class Filer13FResult:
 
 
 JsonFetcher = Callable[[str], Mapping[str, Any]]
+TextFetcher = Callable[[str], str]
+
+
+@dataclass(frozen=True, slots=True)
+class InformationTableDocument:
+    """Raw Information Table XML discovered inside one filing directory."""
+
+    filename: str
+    url: str
+    content: str
 
 
 class SecClient:
@@ -108,6 +123,7 @@ class SecClient:
         *,
         timeout: float = 30.0,
         fetch_json: JsonFetcher | None = None,
+        fetch_text: TextFetcher | None = None,
     ) -> None:
         declared_user_agent = user_agent.strip()
         if not declared_user_agent:
@@ -118,6 +134,7 @@ class SecClient:
         self.user_agent = declared_user_agent
         self.timeout = timeout
         self._fetcher = fetch_json or self._fetch_json
+        self._text_fetcher = fetch_text or self._fetch_text
 
     def get_latest_13f_filings(
         self, cik: str | int, *, limit: int = 2
@@ -166,6 +183,51 @@ class SecClient:
             filings=tuple(ordered[:limit]),
         )
 
+    def get_information_table(self, filing: Filing) -> InformationTableDocument:
+        """Discover and download a filing's XML Information Table."""
+
+        directory_index_url = f"{filing.filing_directory_url}index.json"
+        directory_index = self._fetcher(directory_index_url)
+        if not isinstance(directory_index, Mapping):
+            raise SecResponseError("SEC filing directory index must be a JSON object.")
+
+        directory = directory_index.get("directory")
+        if not isinstance(directory, Mapping):
+            raise SecResponseError("SEC filing index is missing the directory object.")
+        items = directory.get("item") or []
+        if not isinstance(items, list):
+            raise SecResponseError("SEC filing directory item field must be an array.")
+
+        candidates: list[str] = []
+        primary_document = filing.primary_document.casefold()
+        for item in items:
+            if not isinstance(item, Mapping):
+                continue
+            filename = str(item.get("name") or "").strip()
+            if not filename.lower().endswith(".xml"):
+                continue
+            if filename.casefold() == primary_document:
+                continue
+            candidates.append(filename)
+
+        for filename in sorted(set(candidates), key=str.casefold):
+            url = f"{filing.filing_directory_url}{filename}"
+            content = self._text_fetcher(url)
+            try:
+                root = ET.fromstring(content)
+            except ET.ParseError:
+                continue
+            if self._local_name(root.tag).casefold() == "informationtable":
+                return InformationTableDocument(
+                    filename=filename,
+                    url=url,
+                    content=content,
+                )
+
+        raise InformationTableNotFoundError(
+            f"No Information Table XML was found for {filing.accession_number}."
+        )
+
     @staticmethod
     def _extract_13f_rows(cik: str, section: Any) -> list[Filing]:
         if not isinstance(section, Mapping):
@@ -212,6 +274,10 @@ class SecClient:
             unique[filing.accession_number] = filing
         return list(unique.values())
 
+    @staticmethod
+    def _local_name(tag: str) -> str:
+        return tag.rsplit("}", 1)[-1]
+
     def _fetch_json(self, url: str) -> Mapping[str, Any]:
         request = Request(
             url,
@@ -242,3 +308,27 @@ class SecClient:
             raise SecResponseError("SEC JSON response must be an object.")
         return payload
 
+    def _fetch_text(self, url: str) -> str:
+        request = Request(
+            url,
+            headers={
+                "User-Agent": self.user_agent,
+                "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.1",
+            },
+        )
+        try:
+            with urlopen(request, timeout=self.timeout) as response:
+                raw = response.read()
+        except HTTPError as exc:
+            if exc.code == 429:
+                message = "SEC rate limit reached; retry later with a lower request rate."
+            else:
+                message = f"SEC returned HTTP {exc.code} while downloading a filing."
+            raise SecRequestError(message) from exc
+        except (URLError, OSError) as exc:
+            raise SecRequestError(f"Could not reach the SEC: {exc}") from exc
+
+        try:
+            return raw.decode("utf-8-sig")
+        except UnicodeDecodeError as exc:
+            raise SecResponseError("SEC returned a non-UTF-8 filing document.") from exc

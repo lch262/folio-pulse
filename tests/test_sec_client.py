@@ -6,6 +6,8 @@ from unittest.mock import patch
 from urllib.error import HTTPError
 
 from backend.sec_client import (
+    Filing,
+    InformationTableNotFoundError,
     InvalidCikError,
     SecClient,
     SecRequestError,
@@ -105,6 +107,58 @@ class SecClientTests(unittest.TestCase):
         self.assertIsNone(result.latest)
         self.assertIsNone(result.previous)
 
+    def test_discovers_information_table_xml_by_root_element(self) -> None:
+        filing = Filing(
+            cik="0001067983",
+            form="13F-HR",
+            report_date="2026-03-31",
+            filing_date="2026-05-15",
+            accession_number="0001193125-26-226661",
+            primary_document="primary_doc.xml",
+        )
+        directory_index = {
+            "directory": {
+                "item": [
+                    {"name": "primary_doc.xml"},
+                    {"name": "form13f.xsd"},
+                    {"name": "holdings.xml"},
+                ]
+            }
+        }
+        client = SecClient(
+            "FolioPulse test@example.com",
+            fetch_json=lambda _: directory_index,
+            fetch_text=lambda _: (
+                '<informationTable xmlns="http://www.sec.gov/edgar/document/'
+                'thirteenf/informationtable"></informationTable>'
+            ),
+        )
+
+        document = client.get_information_table(filing)
+
+        self.assertEqual(document.filename, "holdings.xml")
+        self.assertTrue(document.url.endswith("/holdings.xml"))
+
+    def test_reports_missing_information_table_xml(self) -> None:
+        filing = Filing(
+            cik="1",
+            form="13F-HR",
+            report_date="2026-03-31",
+            filing_date="2026-05-15",
+            accession_number="0001-26-000001",
+            primary_document="primary.xml",
+        )
+        client = SecClient(
+            "FolioPulse test@example.com",
+            fetch_json=lambda _: {
+                "directory": {"item": [{"name": "primary.xml"}]}
+            },
+            fetch_text=lambda _: "",
+        )
+
+        with self.assertRaises(InformationTableNotFoundError):
+            client.get_information_table(filing)
+
     @patch("backend.sec_client.urlopen")
     def test_translates_sec_rate_limit_errors(self, mocked_urlopen) -> None:
         mocked_urlopen.side_effect = HTTPError(
@@ -122,4 +176,3 @@ class SecClientTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
