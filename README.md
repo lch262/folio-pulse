@@ -1,11 +1,10 @@
 # FolioPulse
 
-FolioPulse 的第一阶段是一个小型 SEC 13F 数据引擎。V0.02 输入基金的
+FolioPulse 的第一阶段是一个小型 SEC 13F 数据引擎。V0.03 输入基金的
 CIK，从 SEC EDGAR 找到最近两份**原始** `13F-HR`，并可自动定位最新 filing
-的 Information Table XML，输出标准化持仓 JSON。
+的 Information Table XML，输出标准化持仓 JSON 和季度持仓变化。
 
-当前版本不会计算季度持仓变化。`13F-HR/A` 修订申报会被忽略，避免把修订
-文件误当成新的季度。
+`13F-HR/A` 修订申报会被忽略，避免把修订文件误当成新的季度。
 
 ## 要求
 
@@ -46,7 +45,26 @@ python -m backend.main 0001067983 `
 
 SEC 从 2023 年 1 月 3 日起把 13F `value` 改为按美元报告；程序会把旧 filing
 的千美元数值乘以 1,000，统一输出 `value_usd`。13F Information Table 通常不含
-ticker，因此 V0.02 不会猜测股票代码，ticker 映射留到后续版本。
+ticker，因此当前版本不会猜测股票代码，ticker 映射留到后续版本。
+
+比较最近两个季度并导出变化：
+
+```powershell
+python -m backend.main 0001067983 `
+  --changes-output data/berkshire_changes.json
+```
+
+变化引擎先按 `CUSIP + Put/Call + SH/PRN` 合并同一证券的拆分行，再根据报告
+数量分类：
+
+- `NEW`：上一季度没有，本季度出现
+- `ADDED`：本季度数量增加
+- `REDUCED`：本季度数量减少
+- `UNCHANGED`：数量未变
+- `EXIT`：上一季度存在，本季度消失
+
+比较使用 shares/principal amount，而不是随股价变化的市值。每条变化同时输出
+previous/current amount、差额、百分比和两期报告市值。
 
 ## 预期输出
 
@@ -78,7 +96,7 @@ python -m unittest discover -s tests -v
 
 测试覆盖 CIK 规范化、排除修订申报、历史 submissions 文件、无 13F 结果，
 SEC 限流、Information Table 发现、XML 命名空间、可选 FIGI、数值单位转换和
-持仓 JSON 导出。
+持仓 JSON 导出，以及重复行聚合、期权分离和五类季度变化。
 
 ## 当前范围
 
@@ -89,4 +107,5 @@ SEC 限流、Information Table 发现、XML 命名空间、可选 FIGI、数值�
 - [x] 离线单元测试
 - [x] 定位并解析 13F Information Table（V0.02）
 - [x] 输出标准化持仓 JSON
-- [ ] 比较季度持仓（V0.03）
+- [x] 比较季度持仓并分类变化（V0.03）
+- [x] 输出季度 changes JSON

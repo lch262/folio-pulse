@@ -44,6 +44,25 @@ class MainTests(unittest.TestCase):
             ),
         )
 
+    @staticmethod
+    def _holding(issuer: str, cusip: str, amount: int) -> Holding:
+        return Holding(
+            issuer=issuer,
+            title_of_class="COM",
+            cusip=cusip,
+            figi=None,
+            reported_value=amount * 10,
+            value_usd=amount * 10,
+            shares_or_principal_amount=amount,
+            shares_or_principal_type="SH",
+            put_call=None,
+            investment_discretion="SOLE",
+            other_manager=None,
+            voting_authority_sole=amount,
+            voting_authority_shared=0,
+            voting_authority_none=0,
+        )
+
     @patch("backend.main.SecClient")
     def test_prints_latest_and_previous_filings(self, client_type) -> None:
         client_type.return_value.get_latest_13f_filings.return_value = self._result()
@@ -126,6 +145,56 @@ class MainTests(unittest.TestCase):
         self.assertEqual(payload["holding_count"], 1)
         self.assertEqual(payload["holdings"][0]["cusip"], "037833100")
         self.assertIn("Holdings: 1", stdout.getvalue())
+
+    @patch("backend.main.parse_information_table")
+    @patch("backend.main.SecClient")
+    def test_exports_quarterly_portfolio_changes(self, client_type, parser) -> None:
+        client = client_type.return_value
+        client.get_latest_13f_filings.return_value = self._result()
+        client.get_information_table.side_effect = (
+            InformationTableDocument(
+                filename="current.xml",
+                url="https://www.sec.gov/example/current.xml",
+                content="<informationTable />",
+            ),
+            InformationTableDocument(
+                filename="previous.xml",
+                url="https://www.sec.gov/example/previous.xml",
+                content="<informationTable />",
+            ),
+        )
+        parser.side_effect = (
+            (
+                self._holding("APPLE INC", "037833100", 270),
+                self._holding("AMAZON", "023135106", 10),
+            ),
+            (
+                self._holding("APPLE INC", "037833100", 300),
+                self._holding("BANK OF AMERICA", "060505104", 500),
+            ),
+        )
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_path = Path(temporary_directory) / "changes.json"
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                exit_code = main(
+                    [
+                        "0001067983",
+                        "--user-agent",
+                        "FolioPulse test@example.com",
+                        "--changes-output",
+                        str(output_path),
+                    ]
+                )
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["counts"]["new"], 1)
+        self.assertEqual(payload["counts"]["reduced"], 1)
+        self.assertEqual(payload["counts"]["exited"], 1)
+        self.assertEqual(payload["new"][0]["issuer"], "AMAZON")
+        self.assertIn("NEW: 1", stdout.getvalue())
 
 
 if __name__ == "__main__":

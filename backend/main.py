@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 
 from .filing_parser import FilingParseError, Holding, parse_information_table
+from .portfolio_diff import PortfolioDiff, PortfolioDiffError, compare_portfolios
 from .sec_client import Filing, SecClient, SecClientError
 
 
@@ -41,6 +42,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--holdings-output",
         metavar="PATH",
         help="Download and write the latest 13F Information Table as JSON.",
+    )
+    parser.add_argument(
+        "--changes-output",
+        metavar="PATH",
+        help="Compare the newest two 13F portfolios and write changes as JSON.",
     )
     return parser
 
@@ -79,7 +85,23 @@ def _holdings_payload(
     }
 
 
-def _write_holdings(path_value: str, payload: dict[str, object]) -> Path:
+def _changes_payload(
+    *,
+    fund_name: str,
+    previous_filing: Filing,
+    current_filing: Filing,
+    portfolio_diff: PortfolioDiff,
+) -> dict[str, object]:
+    return {
+        "fund": fund_name,
+        "cik": current_filing.cik,
+        "previous_filing": previous_filing.to_dict(),
+        "current_filing": current_filing.to_dict(),
+        **portfolio_diff.to_dict(),
+    }
+
+
+def _write_json(path_value: str, payload: dict[str, object]) -> Path:
     output_path = Path(path_value)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
@@ -98,30 +120,68 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     holdings_summary: dict[str, object] | None = None
+    changes_summary: dict[str, object] | None = None
     try:
         client = SecClient(args.user_agent)
         result = client.get_latest_13f_filings(args.cik)
+        parsed_holdings: dict[str, tuple[str, tuple[Holding, ...]]] = {}
+
+        def load_holdings(filing: Filing) -> tuple[str, tuple[Holding, ...]]:
+            cached = parsed_holdings.get(filing.accession_number)
+            if cached is not None:
+                return cached
+            document = client.get_information_table(filing)
+            holdings = parse_information_table(
+                document.content,
+                filing_date=filing.filing_date,
+            )
+            parsed = (document.url, holdings)
+            parsed_holdings[filing.accession_number] = parsed
+            return parsed
+
         if args.holdings_output:
             if result.latest is None:
                 raise FilingParseError("No original 13F-HR is available to parse.")
-            document = client.get_information_table(result.latest)
-            holdings = parse_information_table(
-                document.content,
-                filing_date=result.latest.filing_date,
-            )
+            source_url, holdings = load_holdings(result.latest)
             payload = _holdings_payload(
                 fund_name=result.name,
                 filing=result.latest,
-                source_url=document.url,
+                source_url=source_url,
                 holdings=holdings,
             )
-            output_path = _write_holdings(args.holdings_output, payload)
+            output_path = _write_json(args.holdings_output, payload)
             holdings_summary = {
                 "count": len(holdings),
                 "output": str(output_path),
-                "source_url": document.url,
+                "source_url": source_url,
             }
-    except (FilingParseError, OSError, SecClientError, ValueError) as exc:
+
+        if args.changes_output:
+            if result.latest is None or result.previous is None:
+                raise PortfolioDiffError(
+                    "Two original 13F-HR filings are required for comparison."
+                )
+            _, current_holdings = load_holdings(result.latest)
+            _, previous_holdings = load_holdings(result.previous)
+            portfolio_diff = compare_portfolios(previous_holdings, current_holdings)
+            payload = _changes_payload(
+                fund_name=result.name,
+                previous_filing=result.previous,
+                current_filing=result.latest,
+                portfolio_diff=portfolio_diff,
+            )
+            output_path = _write_json(args.changes_output, payload)
+            changes_summary = {
+                "counts": portfolio_diff.counts,
+                "output": str(output_path),
+            }
+    except (
+        FilingParseError,
+        OSError,
+        PortfolioDiffError,
+        SecClientError,
+        ValueError,
+    ) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
@@ -129,6 +189,8 @@ def main(argv: list[str] | None = None) -> int:
         output = result.to_dict()
         if holdings_summary is not None:
             output["holdings_export"] = holdings_summary
+        if changes_summary is not None:
+            output["changes_export"] = changes_summary
         print(json.dumps(output, indent=2, ensure_ascii=False))
     else:
         print("FolioPulse SEC Tracker")
@@ -140,6 +202,14 @@ def main(argv: list[str] | None = None) -> int:
             print("\nInformation Table")
             print(f"Holdings: {holdings_summary['count']}")
             print(f"Saved: {holdings_summary['output']}")
+        if changes_summary is not None:
+            counts = changes_summary["counts"]
+            print("\nPortfolio Changes")
+            print(
+                "NEW: {new} | ADDED: {added} | REDUCED: {reduced} | "
+                "UNCHANGED: {unchanged} | EXITED: {exited}".format(**counts)
+            )
+            print(f"Saved: {changes_summary['output']}")
 
     if len(result.filings) < 2:
         print(

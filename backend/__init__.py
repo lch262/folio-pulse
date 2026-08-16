@@ -1,6 +1,12 @@
 """FolioPulse SEC data engine."""
 
 from .filing_parser import FilingParseError, Holding, parse_information_table
+from .portfolio_diff import (
+    PortfolioDiff,
+    PortfolioDiffError,
+    PositionChange,
+    compare_portfolios,
+)
 from .sec_client import (
     Filing,
     Filer13FResult,
@@ -14,6 +20,10 @@ __all__ = [
     "FilingParseError",
     "Holding",
     "InformationTableDocument",
+    "PortfolioDiff",
+    "PortfolioDiffError",
+    "PositionChange",
     "SecClient",
+    "compare_portfolios",
     "parse_information_table",
 ]
