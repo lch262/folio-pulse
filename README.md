@@ -1,8 +1,8 @@
 # FolioPulse
 
-FolioPulse 的第一阶段是一个小型 SEC 13F 数据引擎。V0.03 输入基金的
+FolioPulse 的第一阶段是一个小型 SEC 13F 数据引擎。V0.04 输入基金的
 CIK，从 SEC EDGAR 找到最近两份**原始** `13F-HR`，并可自动定位最新 filing
-的 Information Table XML，输出标准化持仓 JSON 和季度持仓变化。
+的 Information Table XML，输出标准化持仓 JSON、季度持仓变化并监控新的 filing。
 
 `13F-HR/A` 修订申报会被忽略，避免把修订文件误当成新的季度。
 
@@ -66,6 +66,28 @@ python -m backend.main 0001067983 `
 比较使用 shares/principal amount，而不是随股价变化的市值。每条变化同时输出
 previous/current amount、差额、百分比和两期报告市值。
 
+## 监控新的 13F
+
+先执行一次检查并建立基线：
+
+```powershell
+python -m backend.filing_watcher 0001067983 --once
+```
+
+首次运行会显示 `INITIALIZED`，并把最新 accession 写入
+`data/watcher_state.json`，不会把已有 filing 误报成新事件。再次检查时，相同
+accession 显示 `UNCHANGED`；检测到更晚的 filing 时显示 `NEW_FILING`。
+
+持续监控，默认每 60 秒检查一次：
+
+```powershell
+python -m backend.filing_watcher 0001067983
+```
+
+可用 `Ctrl+C` 安全停止。也可以通过 `--interval 120` 调整轮询秒数，或使用
+`--json` 输出单行 JSON 事件。Watcher 使用同一个 `FOLIOPULSE_SEC_USER_AGENT`
+环境变量，并且状态文件已被 `.gitignore` 排除。
+
 ## 预期输出
 
 ```text
@@ -97,6 +119,7 @@ python -m unittest discover -s tests -v
 测试覆盖 CIK 规范化、排除修订申报、历史 submissions 文件、无 13F 结果，
 SEC 限流、Information Table 发现、XML 命名空间、可选 FIGI、数值单位转换和
 持仓 JSON 导出，以及重复行聚合、期权分离和五类季度变化。
+Watcher 测试还覆盖首次基线、无变化、新 filing、旧结果保护和损坏状态保护。
 
 ## 当前范围
 
@@ -109,3 +132,5 @@ SEC 限流、Information Table 发现、XML 命名空间、可选 FIGI、数值�
 - [x] 输出标准化持仓 JSON
 - [x] 比较季度持仓并分类变化（V0.03）
 - [x] 输出季度 changes JSON
+- [x] 监控新的原始 13F-HR（V0.04）
+- [x] 原子保存 watcher accession 状态
