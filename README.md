@@ -1,6 +1,6 @@
 # FolioPulse
 
-FolioPulse 的第一阶段是一个小型 SEC 13F 数据引擎。V0.04 输入基金的
+FolioPulse 是一个 SEC 13F 数据引擎与可视化仪表盘。V0.05 输入基金的
 CIK，从 SEC EDGAR 找到最近两份**原始** `13F-HR`，并可自动定位最新 filing
 的 Information Table XML，输出标准化持仓 JSON、季度持仓变化并监控新的 filing。
 
@@ -121,6 +121,20 @@ SEC 限流、Information Table 发现、XML 命名空间、可选 FIGI、数值�
 持仓 JSON 导出，以及重复行聚合、期权分离和五类季度变化。
 Watcher 测试还覆盖首次基线、无变化、新 filing、旧结果保护和损坏状态保护。
 
+## 可视化仪表盘
+
+`web/` 是面向用户的 FolioPulse 仪表盘，包含组合概览、前五大持仓、季度信号、
+变化筛选、公司搜索与 `/api/portfolio` JSON 接口。当前页面使用明确标记的演示
+快照验证产品交互；下一阶段会把 Python 引擎的标准化输出接入该接口。
+
+```powershell
+cd web
+npm install
+npm run dev
+```
+
+打开 `http://localhost:3000`。生产构建使用 `npm run build`。
+
 ## 当前范围
 
 - [x] 规范化为十位 CIK
@@ -134,3 +148,6 @@ Watcher 测试还覆盖首次基线、无变化、新 filing、旧结果保护�
 - [x] 输出季度 changes JSON
 - [x] 监控新的原始 13F-HR（V0.04）
 - [x] 原子保存 watcher accession 状态
+- [x] 面向用户的响应式持仓仪表盘（V0.05）
+- [x] 持仓变化筛选与公司搜索
+- [x] Portfolio JSON 接口
