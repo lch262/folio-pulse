@@ -16,8 +16,17 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await getChatGPTUser();
   if (!user) return Response.json({ error: "需要登录后才能导入数据。" }, { status: 401 });
-  const adminUserId = (env as unknown as { FOLIOPULSE_ADMIN_USER_ID?: string }).FOLIOPULSE_ADMIN_USER_ID;
-  if (!adminUserId || user.userId !== adminUserId) {
+  const admin = env as unknown as {
+    FOLIOPULSE_ADMIN_USER_ID?: string;
+    FOLIOPULSE_ADMIN_EMAIL?: string;
+  };
+  const matchesUserId =
+    !!admin.FOLIOPULSE_ADMIN_USER_ID &&
+    user.userId === admin.FOLIOPULSE_ADMIN_USER_ID;
+  const matchesEmail =
+    !!admin.FOLIOPULSE_ADMIN_EMAIL &&
+    user.email.toLowerCase() === admin.FOLIOPULSE_ADMIN_EMAIL.toLowerCase();
+  if (!matchesUserId && !matchesEmail) {
     return Response.json({ error: "当前账号没有导入权限。" }, { status: 403 });
   }
   let body: unknown;
