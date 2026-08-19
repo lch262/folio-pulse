@@ -41,7 +41,8 @@ function isPortfolioSnapshot(value: unknown): value is PortfolioSnapshot {
   const item = value as Partial<PortfolioSnapshot>;
   return typeof item.manager === "string" && typeof item.managerShort === "string" &&
     typeof item.cik === "string" && /^\d{10}$/.test(item.cik) &&
-    typeof item.reportDate === "string" && typeof item.filedAt === "string" &&
+    typeof item.previousReportDate === "string" && typeof item.reportDate === "string" &&
+    typeof item.filedAt === "string" &&
     typeof item.totalValue === "number" && Number.isFinite(item.totalValue) &&
     typeof item.positionCount === "number" && Array.isArray(item.positions) && !!item.changes &&
     ["NEW", "ADDED", "REDUCED", "EXIT", "UNCHANGED"].every((key) => typeof item.changes?.[key as keyof typeof item.changes] === "number");

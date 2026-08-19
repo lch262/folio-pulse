@@ -192,6 +192,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.web_snapshot_output:
                 snapshot = build_web_snapshot(
                     fund_name=result.name,
+                    previous_filing=result.previous,
                     current_filing=result.latest,
                     current_holdings=current_holdings,
                     portfolio_diff=portfolio_diff,

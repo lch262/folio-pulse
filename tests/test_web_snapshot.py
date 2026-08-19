@@ -40,6 +40,14 @@ class WebSnapshotTests(unittest.TestCase):
             holding("APPLE INC", "037833100", 270, 4_000_000_000),
             holding("AMAZON", "023135106", 10, 1_000_000_000),
         )
+        previous_filing = Filing(
+            cik="0001067983",
+            form="13F-HR",
+            report_date="2026-03-31",
+            filing_date="2026-05-15",
+            accession_number="0001193125-26-000000",
+            primary_document="previous.xml",
+        )
         filing = Filing(
             cik="0001067983",
             form="13F-HR",
@@ -51,6 +59,7 @@ class WebSnapshotTests(unittest.TestCase):
 
         snapshot = build_web_snapshot(
             fund_name="BERKSHIRE HATHAWAY INC",
+            previous_filing=previous_filing,
             current_filing=filing,
             current_holdings=current,
             portfolio_diff=compare_portfolios(previous, current),
@@ -59,6 +68,7 @@ class WebSnapshotTests(unittest.TestCase):
 
         self.assertEqual(snapshot["totalValue"], 5.0)
         self.assertEqual(snapshot["positionCount"], 2)
+        self.assertEqual(snapshot["previousReportDate"], "2026-03-31")
         self.assertEqual(snapshot["changes"]["NEW"], 1)
         self.assertEqual(snapshot["changes"]["EXIT"], 1)
         self.assertEqual(snapshot["positions"][0]["ticker"], "AAPL")

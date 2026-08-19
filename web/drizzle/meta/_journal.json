@@ -8,6 +8,13 @@
       "when": 1786893253724,
       "tag": "0000_mute_sasquatch",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1787154284609,
+      "tag": "0001_sparkling_stardust",
+      "breakpoints": true
     }
   ]
 }

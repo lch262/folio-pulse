@@ -16,6 +16,7 @@ export type PortfolioSnapshot = {
   manager: string;
   managerShort: string;
   cik: string;
+  previousReportDate: string;
   reportDate: string;
   filedAt: string;
   source: string;
@@ -29,6 +30,7 @@ export const portfolioSnapshot: PortfolioSnapshot = {
   manager: "Berkshire Hathaway",
   managerShort: "伯克希尔·哈撒韦",
   cik: "0001067983",
+  previousReportDate: "2026-03-31",
   reportDate: "2026-06-30",
   filedAt: "2026-08-14",
   source: "SEC 13F-HR",

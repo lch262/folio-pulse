@@ -11,6 +11,7 @@ export const funds = sqliteTable("funds", {
 export const filings = sqliteTable("filings", {
   id: text("id").primaryKey(),
   fundId: text("fund_id").notNull().references(() => funds.id, { onDelete: "cascade" }),
+  previousReportDate: text("previous_report_date").notNull().default(""),
   reportDate: text("report_date").notNull(),
   filedAt: text("filed_at").notNull(),
   source: text("source").notNull(),

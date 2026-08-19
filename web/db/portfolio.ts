@@ -3,7 +3,8 @@ import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "../a
 
 type FilingRow = {
   id: string; manager: string; manager_short: string; cik: string;
-  report_date: string; filed_at: string; source: string; total_value_usd: number;
+  previous_report_date: string; report_date: string; filed_at: string;
+  source: string; total_value_usd: number;
   position_count: number; new_count: number; added_count: number;
   reduced_count: number; exit_count: number; unchanged_count: number;
 };
@@ -32,7 +33,7 @@ async function initializeSchema() {
   await db.batch([
     db.prepare("CREATE TABLE IF NOT EXISTS funds (id TEXT PRIMARY KEY, name TEXT NOT NULL, name_zh TEXT NOT NULL, cik TEXT NOT NULL, created_at TEXT NOT NULL)"),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_funds_cik ON funds(cik)"),
-    db.prepare("CREATE TABLE IF NOT EXISTS filings (id TEXT PRIMARY KEY, fund_id TEXT NOT NULL REFERENCES funds(id) ON DELETE CASCADE, report_date TEXT NOT NULL, filed_at TEXT NOT NULL, source TEXT NOT NULL, total_value_usd INTEGER NOT NULL, position_count INTEGER NOT NULL, new_count INTEGER NOT NULL, added_count INTEGER NOT NULL, reduced_count INTEGER NOT NULL, exit_count INTEGER NOT NULL, unchanged_count INTEGER NOT NULL, data_status TEXT NOT NULL, updated_at TEXT NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS filings (id TEXT PRIMARY KEY, fund_id TEXT NOT NULL REFERENCES funds(id) ON DELETE CASCADE, previous_report_date TEXT NOT NULL DEFAULT '', report_date TEXT NOT NULL, filed_at TEXT NOT NULL, source TEXT NOT NULL, total_value_usd INTEGER NOT NULL, position_count INTEGER NOT NULL, new_count INTEGER NOT NULL, added_count INTEGER NOT NULL, reduced_count INTEGER NOT NULL, exit_count INTEGER NOT NULL, unchanged_count INTEGER NOT NULL, data_status TEXT NOT NULL, updated_at TEXT NOT NULL)"),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_filings_fund_report ON filings(fund_id, report_date)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_filings_report_date ON filings(report_date)"),
     db.prepare("CREATE TABLE IF NOT EXISTS positions (id INTEGER PRIMARY KEY AUTOINCREMENT, filing_id TEXT NOT NULL REFERENCES filings(id) ON DELETE CASCADE, issuer TEXT NOT NULL, ticker TEXT NOT NULL, sector TEXT NOT NULL, value_usd INTEGER NOT NULL, weight REAL NOT NULL, shares INTEGER NOT NULL, share_change INTEGER NOT NULL, change_percent REAL, change_type TEXT NOT NULL)"),
@@ -47,7 +48,8 @@ export async function getLatestPortfolio(): Promise<PortfolioSnapshot> {
   const db = database();
   const latest = await db.prepare(`
     SELECT filings.id, funds.name AS manager, funds.name_zh AS manager_short, funds.cik,
-      filings.report_date, filings.filed_at, filings.source, filings.total_value_usd,
+      filings.previous_report_date, filings.report_date, filings.filed_at,
+      filings.source, filings.total_value_usd,
       filings.position_count, filings.new_count, filings.added_count,
       filings.reduced_count, filings.exit_count, filings.unchanged_count
     FROM filings JOIN funds ON funds.id = filings.fund_id
@@ -67,6 +69,7 @@ export async function getLatestPortfolio(): Promise<PortfolioSnapshot> {
 
   return {
     manager: latest.manager, managerShort: latest.manager_short, cik: latest.cik,
+    previousReportDate: latest.previous_report_date || previousQuarterDate(latest.report_date),
     reportDate: latest.report_date, filedAt: latest.filed_at, source: latest.source,
     totalValue: latest.total_value_usd / 1_000_000_000,
     positionCount: latest.position_count,
@@ -87,7 +90,7 @@ export async function savePortfolio(snapshot: PortfolioSnapshot, dataStatus = "i
   const now = new Date().toISOString();
   const writes: D1PreparedStatement[] = [
     db.prepare("INSERT INTO funds (id, name, name_zh, cik, created_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name=excluded.name, name_zh=excluded.name_zh, cik=excluded.cik").bind(fundId, snapshot.manager, snapshot.managerShort, snapshot.cik, now),
-    db.prepare("INSERT INTO filings (id, fund_id, report_date, filed_at, source, total_value_usd, position_count, new_count, added_count, reduced_count, exit_count, unchanged_count, data_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET filed_at=excluded.filed_at, source=excluded.source, total_value_usd=excluded.total_value_usd, position_count=excluded.position_count, new_count=excluded.new_count, added_count=excluded.added_count, reduced_count=excluded.reduced_count, exit_count=excluded.exit_count, unchanged_count=excluded.unchanged_count, data_status=excluded.data_status, updated_at=excluded.updated_at").bind(filingId, fundId, snapshot.reportDate, snapshot.filedAt, snapshot.source, Math.round(snapshot.totalValue * 1_000_000_000), snapshot.positionCount, snapshot.changes.NEW, snapshot.changes.ADDED, snapshot.changes.REDUCED, snapshot.changes.EXIT, snapshot.changes.UNCHANGED, dataStatus, now),
+    db.prepare("INSERT INTO filings (id, fund_id, previous_report_date, report_date, filed_at, source, total_value_usd, position_count, new_count, added_count, reduced_count, exit_count, unchanged_count, data_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET previous_report_date=excluded.previous_report_date, filed_at=excluded.filed_at, source=excluded.source, total_value_usd=excluded.total_value_usd, position_count=excluded.position_count, new_count=excluded.new_count, added_count=excluded.added_count, reduced_count=excluded.reduced_count, exit_count=excluded.exit_count, unchanged_count=excluded.unchanged_count, data_status=excluded.data_status, updated_at=excluded.updated_at").bind(filingId, fundId, snapshot.previousReportDate, snapshot.reportDate, snapshot.filedAt, snapshot.source, Math.round(snapshot.totalValue * 1_000_000_000), snapshot.positionCount, snapshot.changes.NEW, snapshot.changes.ADDED, snapshot.changes.REDUCED, snapshot.changes.EXIT, snapshot.changes.UNCHANGED, dataStatus, now),
     db.prepare("DELETE FROM positions WHERE filing_id = ?").bind(filingId),
   ];
   for (const position of snapshot.positions) {
@@ -95,4 +98,11 @@ export async function savePortfolio(snapshot: PortfolioSnapshot, dataStatus = "i
   }
   await db.batch(writes);
   await db.prepare("PRAGMA optimize").run();
+}
+
+function previousQuarterDate(reportDate: string): string {
+  const date = new Date(`${reportDate}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return reportDate;
+  date.setUTCMonth(date.getUTCMonth() - 3);
+  return date.toISOString().slice(0, 10);
 }

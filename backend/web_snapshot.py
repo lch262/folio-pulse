@@ -49,6 +49,7 @@ def load_ticker_map(path_value: str | None) -> dict[str, str]:
 def build_web_snapshot(
     *,
     fund_name: str,
+    previous_filing: Filing,
     current_filing: Filing,
     current_holdings: tuple[Holding, ...],
     portfolio_diff: PortfolioDiff,
@@ -56,6 +57,8 @@ def build_web_snapshot(
 ) -> dict[str, object]:
     """Build the JSON contract consumed by POST /api/portfolio."""
 
+    if not previous_filing.report_date:
+        raise WebSnapshotError("The previous filing must include a report date.")
     if not current_filing.report_date or not current_filing.filing_date:
         raise WebSnapshotError("The current filing must include report and filing dates.")
 
@@ -113,6 +116,7 @@ def build_web_snapshot(
         "manager": fund_name,
         "managerShort": fund_name,
         "cik": current_filing.cik,
+        "previousReportDate": previous_filing.report_date,
         "reportDate": current_filing.report_date,
         "filedAt": current_filing.filing_date,
         "source": "SEC 13F-HR",
