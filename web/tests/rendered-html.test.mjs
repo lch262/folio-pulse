@@ -18,6 +18,7 @@ test("renders the FolioPulse dashboard", async () => {
   assert.match(html, /FolioPulse/);
   assert.match(html, /伯克希尔·哈撒韦/);
   assert.match(html, /持仓与变化/);
+  assert.match(html, /导入快照/);
   assert.match(html, /SEC 13F/);
   assert.doesNotMatch(html, /Your site is taking shape|SkeletonPreview/);
 });

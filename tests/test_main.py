@@ -196,6 +196,53 @@ class MainTests(unittest.TestCase):
         self.assertEqual(payload["new"][0]["issuer"], "AMAZON")
         self.assertIn("NEW: 1", stdout.getvalue())
 
+    @patch("backend.main.parse_information_table")
+    @patch("backend.main.SecClient")
+    def test_exports_website_import_snapshot(self, client_type, parser) -> None:
+        client = client_type.return_value
+        client.get_latest_13f_filings.return_value = self._result()
+        client.get_information_table.side_effect = (
+            InformationTableDocument(
+                filename="current.xml",
+                url="https://www.sec.gov/example/current.xml",
+                content="<informationTable />",
+            ),
+            InformationTableDocument(
+                filename="previous.xml",
+                url="https://www.sec.gov/example/previous.xml",
+                content="<informationTable />",
+            ),
+        )
+        parser.side_effect = (
+            (self._holding("APPLE INC", "037833100", 270),),
+            (self._holding("APPLE INC", "037833100", 300),),
+        )
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_path = Path(temporary_directory) / "web-snapshot.json"
+            ticker_path = Path(temporary_directory) / "tickers.json"
+            ticker_path.write_text('{"037833100": "AAPL"}', encoding="utf-8")
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                exit_code = main(
+                    [
+                        "0001067983",
+                        "--user-agent",
+                        "FolioPulse test@example.com",
+                        "--web-snapshot-output",
+                        str(output_path),
+                        "--ticker-map",
+                        str(ticker_path),
+                    ]
+                )
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["positionCount"], 1)
+        self.assertEqual(payload["positions"][0]["ticker"], "AAPL")
+        self.assertEqual(payload["positions"][0]["changeType"], "REDUCED")
+        self.assertIn("Website Snapshot", stdout.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

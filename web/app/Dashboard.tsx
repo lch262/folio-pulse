@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "./lib/portfolio-data";
 
 const filters: Array<{ key: "ALL" | ChangeType; label: string }> = [
@@ -36,6 +36,9 @@ export default function Dashboard() {
   const [query, setQuery] = useState("");
   const [snapshot, setSnapshot] = useState<PortfolioSnapshot>(portfolioSnapshot);
   const [storageStatus, setStorageStatus] = useState("正在连接数据层");
+  const [importState, setImportState] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [importMessage, setImportMessage] = useState("");
+  const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -56,6 +59,43 @@ export default function Dashboard() {
       (!normalized || item.ticker.toLowerCase().includes(normalized) || item.issuer.toLowerCase().includes(normalized));
   }), [filter, query, snapshot]);
 
+  const signals = useMemo(
+    () => snapshot.positions.filter((item) => item.changeType !== "UNCHANGED").slice(0, 3),
+    [snapshot],
+  );
+
+  async function importSnapshot(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setImportState("error");
+      setImportMessage("文件超过 5 MB，请确认选择的是网站快照 JSON。 ");
+      return;
+    }
+    setImportState("uploading");
+    setImportMessage("正在验证并导入快照…");
+    try {
+      const payload = JSON.parse(await file.text());
+      const response = await fetch("/api/portfolio", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "导入失败。");
+      setSnapshot(result.data);
+      setFilter("ALL");
+      setQuery("");
+      setStorageStatus("已导入快照");
+      setImportState("success");
+      setImportMessage(`已导入 ${result.data.reportDate} 报告期，共 ${result.data.positionCount} 个持仓。`);
+    } catch (error) {
+      setImportState("error");
+      setImportMessage(error instanceof Error ? error.message : "无法读取该 JSON 文件。");
+    }
+  }
+
   return (
     <main>
       <header className="site-header">
@@ -64,7 +104,10 @@ export default function Dashboard() {
           <span>Folio<span>Pulse</span></span>
         </a>
         <nav aria-label="主导航"><a className="active" href="#overview">概览</a><a href="#holdings">持仓</a><a href="#changes">调仓</a><a href="#method">数据说明</a></nav>
-        <button className="watch-button" type="button">+ 加入关注</button>
+        <div className="header-actions">
+          <input ref={importInput} className="import-input" type="file" accept="application/json,.json" onChange={importSnapshot} />
+          <button className="watch-button" type="button" disabled={importState === "uploading"} onClick={() => importInput.current?.click()}>{importState === "uploading" ? "导入中…" : "导入快照"}</button>
+        </div>
       </header>
 
       <section className="hero" id="top">
@@ -97,11 +140,12 @@ export default function Dashboard() {
 
           <article className="panel signal-panel" id="changes">
             <span className="section-kicker">本季信号</span><h2>资金动作速览</h2>
-            <div className="signal-list">
-              <div><span className="signal-icon new">N</span><p><strong>首次买入 STZ</strong><small>约 $3.82B · 新建仓</small></p></div>
-              <div><span className="signal-icon up">↗</span><p><strong>继续增持 OXY</strong><small>股份数增加 3.08%</small></p></div>
-              <div><span className="signal-icon down">↘</span><p><strong>继续减持 AAPL</strong><small>股份数减少 6.67%</small></p></div>
-            </div>
+            <div className="signal-list">{signals.map((item, index) => {
+              const signalClass = item.changeType === "NEW" ? "new" : item.changeType === "ADDED" ? "up" : "down";
+              const signalMark = item.changeType === "NEW" ? "N" : item.changeType === "ADDED" ? "↗" : "↘";
+              const detail = item.changePercent === null ? money(item.value) : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`;
+              return <div key={`${item.ticker}-${index}`}><span className={`signal-icon ${signalClass}`}>{signalMark}</span><p><strong>{changeLabels[item.changeType]} {item.ticker}</strong><small>{item.issuer} · {detail}</small></p></div>;
+            })}</div>
             <a className="text-link" href="#holdings">查看完整调仓记录 <Icon name="arrow" /></a>
           </article>
         </div>
@@ -110,7 +154,7 @@ export default function Dashboard() {
           <div className="holdings-heading"><div><span className="section-kicker">完整明细</span><h2>持仓与变化</h2></div><label className="search-box"><Icon name="search" /><input aria-label="搜索公司或代码" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索公司或代码" /></label></div>
           <div className="filter-row" role="tablist" aria-label="持仓变化筛选">{filters.map((item) => <button key={item.key} className={filter === item.key ? "selected" : ""} onClick={() => setFilter(item.key)} type="button">{item.label}{item.key !== "ALL" && <span>{snapshot.changes[item.key]}</span>}</button>)}</div>
           <div className="table-wrap"><table><thead><tr><th>公司 / 代码</th><th>变化</th><th>当前市值</th><th>组合占比</th><th>股份变化</th></tr></thead><tbody>
-            {positions.map((item) => <tr key={item.ticker}>
+            {positions.map((item, index) => <tr key={`${item.ticker}-${item.changeType}-${index}`}>
               <td><div className="company-cell"><span className="ticker-badge">{item.ticker.slice(0, 2)}</span><span><strong>{item.ticker}</strong><small>{item.issuer} · {item.sector}</small></span></div></td>
               <td><span className={`change-tag ${item.changeType.toLowerCase()}`}>{changeLabels[item.changeType]}</span></td>
               <td className="number"><strong>{money(item.value)}</strong></td><td className="number">{item.weight ? `${item.weight.toFixed(2)}%` : "—"}</td>
@@ -121,7 +165,8 @@ export default function Dashboard() {
       </section>
 
       <section className="method" id="method"><div><span className="section-kicker">数据口径</span><h2>来自原始文件，不靠二手摘要</h2></div><p>FolioPulse 读取 SEC EDGAR 的原始 13F-HR 与信息表，按 CUSIP 聚合后比较相邻季度。13F 最长可滞后 45 天，页面只用于研究，不构成投资建议。</p></section>
-      <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.2 · 持久化数据层已启用</span></footer>
+      {importMessage && <div className={`import-toast ${importState}`} role="status"><strong>{importState === "success" ? "导入完成" : importState === "error" ? "导入未完成" : "正在处理"}</strong><span>{importMessage}</span><button type="button" aria-label="关闭提示" onClick={() => setImportMessage("")}>×</button></div>}
+      <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.3 · SEC 快照导入已启用</span></footer>
     </main>
   );
 }

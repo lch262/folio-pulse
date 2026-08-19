@@ -66,6 +66,18 @@ python -m backend.main 0001067983 `
 比较使用 shares/principal amount，而不是随股价变化的市值。每条变化同时输出
 previous/current amount、差额、百分比和两期报告市值。
 
+生成可直接导入网站的快照：
+
+```powershell
+python -m backend.main 0001067983 `
+  --web-snapshot-output data/berkshire_web_snapshot.json `
+  --ticker-map data/tickers.json
+```
+
+`--ticker-map` 是可选的 CUSIP 到 ticker JSON 对象；未提供映射的证券会以 CUSIP
+作为显示代码，不会猜测 ticker。快照会计算组合权重、带入五类季度变化，并保留
+已清仓证券。登录 FolioPulse 后点击右上角“导入快照”即可写入持久化数据库。
+
 ## 监控新的 13F
 
 先执行一次检查并建立基线：
@@ -154,3 +166,5 @@ npm run dev
 - [x] Portfolio JSON 接口
 - [x] D1 持久化基金、申报与持仓数据（V0.06）
 - [x] 受账号权限保护的持仓快照导入接口
+- [x] Python SEC 数据到网站快照的转换器（V0.07）
+- [x] 管理员 JSON 导入界面与动态调仓信号
