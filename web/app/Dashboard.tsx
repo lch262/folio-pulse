@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
-import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "./lib/portfolio-data";
 
@@ -104,14 +103,6 @@ export default function Dashboard() {
     }
   }
 
-  function focusPosition(ticker: string) {
-    setFilter("ALL");
-    setOnlyChanged(false);
-    setQuery(ticker);
-    setExpandedKey(ticker);
-    requestAnimationFrame(() => document.getElementById("holdings")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  }
-
   function clearFilters() {
     setFilter("ALL");
     setOnlyChanged(false);
@@ -183,7 +174,7 @@ export default function Dashboard() {
           <article className="panel allocation-panel">
             <div className="panel-heading"><div><span className="section-kicker">组合结构</span><h2>前五大持仓</h2></div><span className="muted">占总市值</span></div>
             <div className="allocation-list">{snapshot.positions.slice(0, 5).map((item, index) => (
-              <button className="allocation-row" type="button" onClick={() => focusPosition(item.ticker)} key={item.ticker} aria-label={`查看 ${item.ticker} 持仓详情`}><span className="rank">0{index + 1}</span><span className="allocation-name"><strong>{item.ticker}</strong><small>{item.issuer}</small></span><span className="bar-track"><span style={{ width: `${item.weight / Math.max(snapshot.positions[0]?.weight ?? 1, 1) * 100}%` }} /></span><strong className="weight">{item.weight.toFixed(2)}%</strong></button>
+              <a className="allocation-row" href={`/holding/${encodeURIComponent(item.ticker)}`} key={item.ticker} aria-label={`打开 ${item.ticker} 持仓详情页`}><span className="rank">0{index + 1}</span><span className="allocation-name"><strong>{item.ticker}</strong><small>{item.issuer}</small></span><span className="bar-track"><span style={{ width: `${item.weight / Math.max(snapshot.positions[0]?.weight ?? 1, 1) * 100}%` }} /></span><strong className="weight">{item.weight.toFixed(2)}%</strong></a>
             ))}</div>
           </article>
 
@@ -193,9 +184,9 @@ export default function Dashboard() {
               const signalClass = item.changeType === "NEW" ? "new" : item.changeType === "ADDED" ? "up" : "down";
               const signalMark = item.changeType === "NEW" ? "N" : item.changeType === "ADDED" ? "↗" : "↘";
               const detail = item.changePercent === null ? money(item.value) : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`;
-              return <button type="button" className="signal-action" onClick={() => focusPosition(item.ticker)} key={`${item.ticker}-${index}`}><span className={`signal-icon ${signalClass}`}>{signalMark}</span><span className="signal-copy"><strong>{changeLabels[item.changeType]} {item.ticker}</strong><small>{item.issuer} · {detail}</small></span><span className="signal-chevron">›</span></button>;
+              return <a className="signal-action" href={`/holding/${encodeURIComponent(item.ticker)}`} key={`${item.ticker}-${index}`}><span className={`signal-icon ${signalClass}`}>{signalMark}</span><span className="signal-copy"><strong>{changeLabels[item.changeType]} {item.ticker}</strong><small>{item.issuer} · {detail}</small></span><span className="signal-chevron">›</span></a>;
             })}</div>
-            <Link className="text-link" href="/changes">查看完整调仓记录 <Icon name="arrow" /></Link>
+            <a className="text-link" href="/changes">查看完整调仓记录 <Icon name="arrow" /></a>
           </article>
         </div>
 
@@ -223,14 +214,14 @@ export default function Dashboard() {
                 <td className="number"><strong>{money(item.value)}</strong></td><td className="number">{item.weight ? `${item.weight.toFixed(2)}%` : "—"}</td>
               </tr>{expanded && <tr className="position-detail-row"><td colSpan={6}><div className="position-detail">
                 <div className="share-flow"><div><span>上季持仓</span><strong>{compactShares(oldShares)}</strong><small>{dateLabel(snapshot.previousReportDate)}</small></div><span className={`flow-change ${item.shareChange > 0 ? "gain" : item.shareChange < 0 ? "loss" : ""}`}>{item.shareChange === 0 ? "持仓未变" : `${item.shareChange > 0 ? "+" : ""}${compactShares(item.shareChange)}`}</span><div><span>本季持仓</span><strong>{compactShares(item.shares)}</strong><small>{dateLabel(snapshot.reportDate)}</small></div></div>
-                <div><div className="detail-grid"><div><span>SEC 披露日期</span><strong>{dateLabel(snapshot.filedAt)}</strong></div><div><span>股份变动比例</span><strong className={item.shareChange > 0 ? "gain" : item.shareChange < 0 ? "loss" : ""}>{item.changePercent === null ? (item.changeType === "NEW" ? "新建仓" : item.changeType === "EXIT" ? "已清仓" : "—") : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`}</strong></div><div><span>本季组合权重</span><strong>{item.weight ? `${item.weight.toFixed(2)}%` : "—"}</strong></div><div><span>当前披露市值</span><strong>{money(item.value)}</strong></div></div><Link className="holding-detail-link" href={`/holding/${encodeURIComponent(item.ticker)}`}>打开 {item.ticker} 独立详情页 →</Link></div>
+                <div><div className="detail-grid"><div><span>SEC 披露日期</span><strong>{dateLabel(snapshot.filedAt)}</strong></div><div><span>股份变动比例</span><strong className={item.shareChange > 0 ? "gain" : item.shareChange < 0 ? "loss" : ""}>{item.changePercent === null ? (item.changeType === "NEW" ? "新建仓" : item.changeType === "EXIT" ? "已清仓" : "—") : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`}</strong></div><div><span>本季组合权重</span><strong>{item.weight ? `${item.weight.toFixed(2)}%` : "—"}</strong></div><div><span>当前披露市值</span><strong>{money(item.value)}</strong></div></div><a className="holding-detail-link" href={`/holding/${encodeURIComponent(item.ticker)}`}>打开 {item.ticker} 独立详情页 →</a></div>
               </div></td></tr>}</Fragment>;
             })}
           </tbody></table>{positions.length === 0 && <div className="empty-state">没有符合条件的持仓</div>}</div>
         </section>
       </section>
 
-      <section className="method" id="method"><div><span className="section-kicker">数据口径</span><h2>来自原始文件，不靠二手摘要</h2></div><div><p>FolioPulse 读取 SEC EDGAR 的原始 13F-HR 与信息表，按 CUSIP 聚合后比较相邻季度。13F 最长可滞后 45 天，页面只用于研究，不构成投资建议。</p><Link className="method-read-more" href="/methodology">查看完整数据说明 →</Link></div></section>
+      <section className="method" id="method"><div><span className="section-kicker">数据口径</span><h2>来自原始文件，不靠二手摘要</h2></div><div><p>FolioPulse 读取 SEC EDGAR 的原始 13F-HR 与信息表，按 CUSIP 聚合后比较相邻季度。13F 最长可滞后 45 天，页面只用于研究，不构成投资建议。</p><a className="method-read-more" href="/methodology">查看完整数据说明 →</a></div></section>
       {importMessage && <div className={`import-toast ${importState}`} role="status"><strong>{importState === "success" ? "导入完成" : importState === "error" ? "导入未完成" : "正在处理"}</strong><span>{importMessage}</span><button type="button" aria-label="关闭提示" onClick={() => setImportMessage("")}>×</button></div>}
       <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.5 · 多页面导航已启用</span></footer>
     </main>

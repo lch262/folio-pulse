@@ -101,8 +101,9 @@ export async function savePortfolio(snapshot: PortfolioSnapshot, dataStatus = "i
 }
 
 function previousQuarterDate(reportDate: string): string {
-  const date = new Date(`${reportDate}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return reportDate;
-  date.setUTCMonth(date.getUTCMonth() - 3);
-  return date.toISOString().slice(0, 10);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(reportDate);
+  if (!match) return reportDate;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  return new Date(Date.UTC(year, month - 3, 0)).toISOString().slice(0, 10);
 }

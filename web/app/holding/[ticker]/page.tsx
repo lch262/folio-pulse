@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "../../components/SiteHeader";
 import ShareButton from "../../components/ShareButton";
@@ -59,7 +58,7 @@ export default async function HoldingDetailPage({ params }: PageProps) {
   return <main className="route-page holding-detail-page">
     <SiteHeader active="holdings" actions={<ShareButton />} />
     <section className="holding-detail-hero">
-      <div className="holding-breadcrumb"><Link href="/holdings">完整持仓</Link><span>/</span><strong>{position.ticker}</strong></div>
+      <div className="holding-breadcrumb"><a href="/holdings">完整持仓</a><span>/</span><strong>{position.ticker}</strong></div>
       <div className="holding-title-row">
         <div className="holding-monogram">{position.ticker.slice(0, 2)}</div>
         <div><span className={`change-tag ${position.changeType.toLowerCase()}`}>{changeLabels[position.changeType]}</span><h1>{position.ticker}</h1><p>{position.issuer} · {position.sector}</p></div>
@@ -94,13 +93,13 @@ export default async function HoldingDetailPage({ params }: PageProps) {
             <div><dt>提交日期</dt><dd>{snapshot.filedAt}</dd></div>
             <div><dt>文件来源</dt><dd>{snapshot.source} · CIK {snapshot.cik}</dd></div>
           </dl>
-          <Link href="/methodology">了解 13F 数据口径 →</Link>
+          <a href="/methodology">了解 13F 数据口径 →</a>
         </aside>
       </div>
 
       <section className="related-holdings">
-        <div className="related-heading"><div><span className="section-kicker">Continue exploring</span><h2>继续查看持仓</h2></div><Link href="/holdings">返回完整持仓 →</Link></div>
-        <div className="related-holding-grid">{fallbackRelated.map((item) => <Link key={item.ticker} href={`/holding/${encodeURIComponent(item.ticker)}`}><span>{item.sector}</span><strong>{item.ticker}</strong><small>{item.issuer}</small><em>{item.weight ? `${item.weight.toFixed(2)}%` : changeLabels[item.changeType]}</em></Link>)}</div>
+        <div className="related-heading"><div><span className="section-kicker">Continue exploring</span><h2>继续查看持仓</h2></div><a href="/holdings">返回完整持仓 →</a></div>
+        <div className="related-holding-grid">{fallbackRelated.map((item) => <a key={item.ticker} href={`/holding/${encodeURIComponent(item.ticker)}`}><span>{item.sector}</span><strong>{item.ticker}</strong><small>{item.issuer}</small><em>{item.weight ? `${item.weight.toFixed(2)}%` : changeLabels[item.changeType]}</em></a>)}</div>
       </section>
     </section>
     <footer><span>FolioPulse · 单股持仓档案</span><span>数据来自 {snapshot.source}，不构成投资建议</span></footer>

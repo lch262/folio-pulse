@@ -23,6 +23,8 @@ test("renders the FolioPulse dashboard", async () => {
   assert.match(html, /多页面导航已启用/);
   assert.match(html, /导入快照/);
   assert.match(html, /SEC 13F/);
+  assert.match(html, /href="\/holdings"/);
+  assert.match(html, /href="\/holding\/AAPL"/);
   assert.doesNotMatch(html, /Your site is taking shape|SkeletonPreview/);
 });
 

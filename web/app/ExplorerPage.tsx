@@ -1,7 +1,8 @@
 "use client";
 
+/* eslint-disable @next/next/no-html-link-for-pages -- full-page navigation avoids a deployed Sites client-router stall */
+
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot, type Position } from "./lib/portfolio-data";
 
@@ -69,7 +70,7 @@ export default function ExplorerPage({ view }: { view: "holdings" | "changes" })
   }
 
   return <main className="route-page">
-    <SiteHeader active={view} actions={<Link className="watch-button route-home-button" href="/">返回概览</Link>} />
+    <SiteHeader active={view} actions={<a className="watch-button route-home-button" href="/">返回概览</a>} />
     <section className="route-hero">
       <div className="route-hero-copy">
         <span className="eyebrow"><span className="live-dot" /> SEC 13F · {storageStatus}</span>
@@ -108,12 +109,12 @@ export default function ExplorerPage({ view }: { view: "holdings" | "changes" })
             <div><span>上季持仓</span><strong>{compactShares(previousShares(item))}</strong><small>{dateLabel(snapshot.previousReportDate)}</small></div>
             <div className={item.shareChange > 0 ? "gain" : item.shareChange < 0 ? "loss" : ""}><span>股份变化</span><strong>{signedShares(item.shareChange)}</strong><small>{item.changePercent === null ? changeLabels[item.changeType] : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`}</small></div>
             <div><span>本季持仓</span><strong>{compactShares(item.shares)}</strong><small>{dateLabel(snapshot.reportDate)}</small></div>
-            <div className="position-detail-links"><Link href={`/holding/${encodeURIComponent(item.ticker)}`}>打开独立详情页 →</Link><Link href={`/?ticker=${encodeURIComponent(item.ticker)}#holdings`}>仪表盘定位 ↗</Link></div>
+            <div className="position-detail-links"><a href={`/holding/${encodeURIComponent(item.ticker)}`}>打开独立详情页 →</a><a href={`/?ticker=${encodeURIComponent(item.ticker)}#holdings`}>仪表盘定位 ↗</a></div>
           </div>}
         </article>;
       })}</div>
       {positions.length === 0 && <div className="route-empty">没有符合当前条件的持仓。<button type="button" onClick={() => { setQuery(""); setFilter("ALL"); }}>清除筛选</button></div>}
     </section>
-    <footer><span>FolioPulse · {view === "holdings" ? "完整持仓档案" : "季度资金动作"}</span><span><Link href="/methodology">了解数据口径 →</Link></span></footer>
+    <footer><span>FolioPulse · {view === "holdings" ? "完整持仓档案" : "季度资金动作"}</span><span><a href="/methodology">了解数据口径 →</a></span></footer>
   </main>;
 }
