@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- full-page navigation avoids a deployed Sites client-router stall */
 import type { ReactNode } from "react";
 
-type ActivePage = "overview" | "holdings" | "changes" | "methodology";
+type ActivePage = "overview" | "managers" | "holdings" | "changes" | "methodology";
 
 const navItems: Array<{ key: ActivePage; label: string; href: string }> = [
   { key: "overview", label: "概览", href: "/" },
+  { key: "managers", label: "投资人", href: "/managers" },
   { key: "holdings", label: "完整持仓", href: "/holdings" },
   { key: "changes", label: "季度调仓", href: "/changes" },
   { key: "methodology", label: "数据说明", href: "/methodology" },

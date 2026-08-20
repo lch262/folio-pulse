@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import SiteHeader from "./components/SiteHeader";
+import { managerProfiles } from "./lib/managers";
 import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "./lib/portfolio-data";
 
 const filters: Array<{ key: "ALL" | ChangeType; label: string }> = [
@@ -162,6 +163,11 @@ export default function Dashboard() {
         </div>
       </section>
 
+      <section className="home-manager-network">
+        <div className="home-manager-heading"><div><span className="section-kicker">Investor network</span><h2>追踪更多投资人</h2><p>从伯克希尔开始，把不同投资策略放进同一个机构网络。</p></div><a href="/managers">打开投资人中心 →</a></div>
+        <div className="home-manager-grid">{managerProfiles.slice(0, 4).map((manager) => <a href={`/manager/${manager.slug}`} key={manager.slug}><span className="manager-avatar">{manager.initials}</span><div><small>{manager.vehicle}</small><strong>{manager.nameZh}</strong><em>{manager.status === "live" ? "真实数据已接入" : "即将接入"}</em></div><span className="home-manager-arrow">→</span></a>)}</div>
+      </section>
+
       <section className="dashboard-shell" id="overview">
         <div className="metrics-grid">
           <article className="metric-card primary"><span>披露持仓市值</span><strong>${snapshot.totalValue.toFixed(2)}B</strong><small>约 {(snapshot.totalValue * 10).toLocaleString("zh-CN")} 亿美元</small></article>
@@ -223,7 +229,7 @@ export default function Dashboard() {
 
       <section className="method" id="method"><div><span className="section-kicker">数据口径</span><h2>来自原始文件，不靠二手摘要</h2></div><div><p>FolioPulse 读取 SEC EDGAR 的原始 13F-HR 与信息表，按 CUSIP 聚合后比较相邻季度。13F 最长可滞后 45 天，页面只用于研究，不构成投资建议。</p><a className="method-read-more" href="/methodology">查看完整数据说明 →</a></div></section>
       {importMessage && <div className={`import-toast ${importState}`} role="status"><strong>{importState === "success" ? "导入完成" : importState === "error" ? "导入未完成" : "正在处理"}</strong><span>{importMessage}</span><button type="button" aria-label="关闭提示" onClick={() => setImportMessage("")}>×</button></div>}
-      <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.5 · 多页面导航已启用</span></footer>
+      <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.7 · 投资人网络已启用</span></footer>
     </main>
   );
 }

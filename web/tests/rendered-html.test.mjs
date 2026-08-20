@@ -20,11 +20,13 @@ test("renders the FolioPulse dashboard", async () => {
   assert.match(html, /持仓与变化/);
   assert.match(html, /仅看变动/);
   assert.match(html, /本季持仓量/);
-  assert.match(html, /多页面导航已启用/);
+  assert.match(html, /投资人网络已启用/);
   assert.match(html, /导入快照/);
   assert.match(html, /SEC 13F/);
   assert.match(html, /href="\/holdings"/);
   assert.match(html, /href="\/holding\/AAPL"/);
+  assert.match(html, /追踪更多投资人/);
+  assert.match(html, /href="\/managers"/);
   assert.doesNotMatch(html, /Your site is taking shape|SkeletonPreview/);
 });
 
@@ -32,6 +34,7 @@ for (const [path, heading, description] of [
   ["/holdings", "完整持仓", "查看伯克希尔 13F 的完整持仓、市值、股数和季度变化。"],
   ["/changes", "季度调仓", "按新建、增持、减持和清仓查看伯克希尔最新季度资金动作。"],
   ["/methodology", "数据说明", "了解 FolioPulse 如何读取 SEC 13F、比较季度持仓并解释数据时效。"],
+  ["/managers", "投资人中心", "搜索、关注并查看知名投资机构的 SEC 13F 持仓档案与数据接入状态。"],
 ]) {
   test(`renders ${path} with route-specific metadata`, async () => {
     const response = await render(path);
@@ -39,6 +42,21 @@ for (const [path, heading, description] of [
     const html = await response.text();
     assert.match(html, new RegExp(heading));
     assert.match(html, new RegExp(description));
+    assert.doesNotMatch(html, /folio-pulse-social\.png/);
+  });
+}
+
+for (const [path, title, description, visibleCopy] of [
+  ["/manager/berkshire", "伯克希尔·哈撒韦｜FolioPulse", "Berkshire Hathaway：以长期持有、高质量企业和集中组合著称。当前已接入最新 SEC 13F 持仓快照。", "前五大持仓"],
+  ["/manager/scion", "Scion 资产管理｜FolioPulse", "Scion Asset Management：关注逆向机会、估值错配和高确信度仓位，组合变化通常具有较强信号感。", "原始文件正在排队接入"],
+]) {
+  test(`renders ${path} with manager-specific metadata`, async () => {
+    const response = await render(path);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, new RegExp(title));
+    assert.match(html, new RegExp(description));
+    assert.match(html, new RegExp(visibleCopy));
     assert.doesNotMatch(html, /folio-pulse-social\.png/);
   });
 }
