@@ -48,7 +48,8 @@ for (const [path, heading, description] of [
 
 for (const [path, title, description, visibleCopy] of [
   ["/manager/berkshire", "伯克希尔·哈撒韦｜FolioPulse", "Berkshire Hathaway：以长期持有、高质量企业和集中组合著称。当前已接入最新 SEC 13F 持仓快照。", "前五大持仓"],
-  ["/manager/scion", "Scion 资产管理｜FolioPulse", "Scion Asset Management：关注逆向机会、估值错配和高确信度仓位，组合变化通常具有较强信号感。", "原始文件正在排队接入"],
+  ["/manager/scion", "Scion 资产管理｜FolioPulse", "Scion Asset Management：关注逆向机会、估值错配和高确信度仓位。当前已接入其最新公开 SEC 13F，并明确标注期权方向。", "PLTR PUT"],
+  ["/manager/bridgewater", "桥水基金｜FolioPulse", "Bridgewater Associates：从跨资产和宏观周期视角观察机构配置，适合与价值型组合进行对照。", "原始文件正在排队接入"],
 ]) {
   test(`renders ${path} with manager-specific metadata`, async () => {
     const response = await render(path);
@@ -64,6 +65,7 @@ for (const [path, title, description, visibleCopy] of [
 for (const [path, title, description] of [
   ["/holding/AAPL", "AAPL 持仓未变｜FolioPulse", "APPLE INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
   ["/holding/GOOGL", "GOOGL 增持｜FolioPulse", "ALPHABET INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+  ["/holding/PLTR%20PUT?manager=scion", "PLTR PUT 新建仓｜FolioPulse", "PALANTIR TECHNOLOGIES INC：2025-06-30 至 2025-09-30 的持仓量、变化量与披露市值。"],
 ]) {
   test(`renders ${path} with record-specific metadata`, async () => {
     const response = await render(path);

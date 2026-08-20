@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SiteHeader from "../../components/SiteHeader";
 import ShareButton from "../../components/ShareButton";
-import { portfolioSnapshot, type ChangeType, type Position } from "../../lib/portfolio-data";
+import { getPortfolioSnapshotForManager, portfolioSnapshot, type ChangeType, type PortfolioSnapshot, type Position } from "../../lib/portfolio-data";
 
 const changeLabels: Record<ChangeType, string> = {
   NEW: "新建仓", ADDED: "增持", REDUCED: "减持", EXIT: "清仓", UNCHANGED: "持仓未变",
 };
 
-function findPosition(snapshot: typeof portfolioSnapshot, ticker: string) {
+function findPosition(snapshot: PortfolioSnapshot, ticker: string) {
   return snapshot.positions.find((item) => item.ticker.toLowerCase() === ticker.toLowerCase());
 }
 
@@ -31,12 +31,21 @@ function explanation(item: Position, snapshot: PortfolioSnapshot) {
   return `${snapshot.managerShort} 本季度${action} ${item.issuer} ${compactShares(Math.abs(item.shareChange))}股，期末持仓为 ${compactShares(item.shares)}股。`;
 }
 
-type PageProps = { params: Promise<{ ticker: string }> };
+type PageProps = {
+  params: Promise<{ ticker: string }>;
+  searchParams: Promise<{ manager?: string | string[] }>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+async function resolveSnapshot(searchParams: PageProps["searchParams"]) {
+  const query = await searchParams;
+  const managerSlug = typeof query.manager === "string" ? query.manager : "berkshire";
+  return { managerSlug, snapshot: getPortfolioSnapshotForManager(managerSlug) ?? portfolioSnapshot };
+}
+
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { ticker: rawTicker } = await params;
   const ticker = decodeURIComponent(rawTicker).toUpperCase();
-  const snapshot = portfolioSnapshot;
+  const { snapshot } = await resolveSnapshot(searchParams);
   const position = findPosition(snapshot, ticker);
   if (!position) return { title: "未找到持仓｜FolioPulse", description: "该股票不在当前披露快照中。", openGraph: { title: "未找到持仓｜FolioPulse", description: "该股票不在当前披露快照中。", images: [] }, twitter: { title: "未找到持仓｜FolioPulse", description: "该股票不在当前披露快照中。", images: [] } };
   const title = `${position.ticker} ${changeLabels[position.changeType]}｜FolioPulse`;
@@ -44,21 +53,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title, description, openGraph: { title, description, images: [] }, twitter: { title, description, images: [] } };
 }
 
-export default async function HoldingDetailPage({ params }: PageProps) {
+export default async function HoldingDetailPage({ params, searchParams }: PageProps) {
   const { ticker: rawTicker } = await params;
   const ticker = decodeURIComponent(rawTicker).toUpperCase();
-  const snapshot = portfolioSnapshot;
+  const { managerSlug, snapshot } = await resolveSnapshot(searchParams);
   const position = findPosition(snapshot, ticker);
   if (!position) notFound();
+  const managerHref = managerSlug === "berkshire" ? "/holdings" : `/manager/${managerSlug}#manager-holdings`;
+  const relatedHref = (relatedTicker: string) => `/holding/${encodeURIComponent(relatedTicker)}?manager=${encodeURIComponent(managerSlug)}`;
 
   const oldShares = previousShares(position);
   const related = snapshot.positions.filter((item) => item.ticker !== position.ticker && item.sector === position.sector).slice(0, 4);
   const fallbackRelated = related.length ? related : snapshot.positions.filter((item) => item.ticker !== position.ticker).slice(0, 4);
 
   return <main className="route-page holding-detail-page">
-    <SiteHeader active="holdings" actions={<ShareButton />} />
+    <SiteHeader active={managerSlug === "berkshire" ? "holdings" : "managers"} actions={<ShareButton />} />
     <section className="holding-detail-hero">
-      <div className="holding-breadcrumb"><a href="/holdings">完整持仓</a><span>/</span><strong>{position.ticker}</strong></div>
+      <div className="holding-breadcrumb"><a href={managerHref}>{snapshot.managerShort}</a><span>/</span><strong>{position.ticker}</strong></div>
       <div className="holding-title-row">
         <div className="holding-monogram">{position.ticker.slice(0, 2)}</div>
         <div><span className={`change-tag ${position.changeType.toLowerCase()}`}>{changeLabels[position.changeType]}</span><h1>{position.ticker}</h1><p>{position.issuer} · {position.sector}</p></div>
@@ -98,8 +109,8 @@ export default async function HoldingDetailPage({ params }: PageProps) {
       </div>
 
       <section className="related-holdings">
-        <div className="related-heading"><div><span className="section-kicker">Continue exploring</span><h2>继续查看持仓</h2></div><a href="/holdings">返回完整持仓 →</a></div>
-        <div className="related-holding-grid">{fallbackRelated.map((item) => <a key={item.ticker} href={`/holding/${encodeURIComponent(item.ticker)}`}><span>{item.sector}</span><strong>{item.ticker}</strong><small>{item.issuer}</small><em>{item.weight ? `${item.weight.toFixed(2)}%` : changeLabels[item.changeType]}</em></a>)}</div>
+        <div className="related-heading"><div><span className="section-kicker">Continue exploring</span><h2>继续查看持仓</h2></div><a href={managerHref}>返回机构持仓 →</a></div>
+        <div className="related-holding-grid">{fallbackRelated.map((item) => <a key={item.ticker} href={relatedHref(item.ticker)}><span>{item.sector}</span><strong>{item.ticker}</strong><small>{item.issuer}</small><em>{item.weight ? `${item.weight.toFixed(2)}%` : changeLabels[item.changeType]}</em></a>)}</div>
       </section>
     </section>
     <footer><span>FolioPulse · 单股持仓档案</span><span>数据来自 {snapshot.source}，不构成投资建议</span></footer>

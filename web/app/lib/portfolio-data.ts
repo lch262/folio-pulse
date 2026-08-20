@@ -70,3 +70,53 @@ export const portfolioSnapshot: PortfolioSnapshot = {
     { issuer: "CONSTELLATION BRANDS INC", ticker: "STZ", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -632890, changePercent: null, changeType: "EXIT" },
   ],
 };
+
+export const scionPortfolioSnapshot: PortfolioSnapshot = {
+  manager: "Scion Asset Management, LLC",
+  managerShort: "Scion 资产管理",
+  cik: "0001649339",
+  previousReportDate: "2025-06-30",
+  reportDate: "2025-09-30",
+  filedAt: "2025-11-03",
+  source: "SEC 13F-HR",
+  totalValue: 1.381198076,
+  positionCount: 8,
+  changes: { NEW: 7, ADDED: 1, REDUCED: 0, EXIT: 14, UNCHANGED: 0 },
+  positions: [
+    { issuer: "PALANTIR TECHNOLOGIES INC", ticker: "PLTR PUT", sector: "未分类", value: 0.9121, weight: 66.036872, shares: 5000000, shareChange: 5000000, changePercent: null, changeType: "NEW" },
+    { issuer: "NVIDIA CORPORATION", ticker: "NVDA PUT", sector: "未分类", value: 0.18658, weight: 13.508562, shares: 1000000, shareChange: 1000000, changePercent: null, changeType: "NEW" },
+    { issuer: "PFIZER INC", ticker: "PFE CALL", sector: "未分类", value: 0.15288, weight: 11.068651, shares: 6000000, shareChange: 6000000, changePercent: null, changeType: "NEW" },
+    { issuer: "HALLIBURTON CO", ticker: "HAL CALL", sector: "未分类", value: 0.0615, weight: 4.452656, shares: 2500000, shareChange: 2500000, changePercent: null, changeType: "NEW" },
+    { issuer: "MOLINA HEALTHCARE INC", ticker: "MOH", sector: "未分类", value: 0.02392, weight: 1.73183, shares: 125000, shareChange: 125000, changePercent: null, changeType: "NEW" },
+    { issuer: "LULULEMON ATHLETICA INC", ticker: "LULU", sector: "未分类", value: 0.017793, weight: 1.288229, shares: 100000, shareChange: 50000, changePercent: 100, changeType: "ADDED" },
+    { issuer: "SLM CORP", ticker: "SLM", sector: "未分类", value: 0.013287895, weight: 0.962056, shares: 480054, shareChange: 480054, changePercent: null, changeType: "NEW" },
+    { issuer: "BRUKER CORP", ticker: "116794207", sector: "未分类", value: 0.013137181, weight: 0.951144, shares: 48334, shareChange: 48334, changePercent: null, changeType: "NEW" },
+    { issuer: "ALIBABA GROUP HLDG LTD", ticker: "BABA CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -250000, changePercent: null, changeType: "EXIT" },
+    { issuer: "ASML HOLDING N V", ticker: "ASML CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -25000, changePercent: null, changeType: "EXIT" },
+    { issuer: "BRUKER CORP", ticker: "BRKR", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -250000, changePercent: null, changeType: "EXIT" },
+    { issuer: "JD.COM INC", ticker: "JD CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -1000000, changePercent: null, changeType: "EXIT" },
+    { issuer: "LAUDER ESTEE COS INC", ticker: "EL CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -500000, changePercent: null, changeType: "EXIT" },
+    { issuer: "LAUDER ESTEE COS INC", ticker: "EL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -150000, changePercent: null, changeType: "EXIT" },
+    { issuer: "LULULEMON ATHLETICA INC", ticker: "LULU CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -400000, changePercent: null, changeType: "EXIT" },
+    { issuer: "MERCADOLIBRE INC", ticker: "MELI", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -3000, changePercent: null, changeType: "EXIT" },
+    { issuer: "META PLATFORMS INC", ticker: "META CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -100000, changePercent: null, changeType: "EXIT" },
+    { issuer: "REGENERON PHARMACEUTICALS", ticker: "REGN CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -200000, changePercent: null, changeType: "EXIT" },
+    { issuer: "REGENERON PHARMACEUTICALS", ticker: "REGN", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -15000, changePercent: null, changeType: "EXIT" },
+    { issuer: "UNITEDHEALTH GROUP INC", ticker: "UNH CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -350000, changePercent: null, changeType: "EXIT" },
+    { issuer: "UNITEDHEALTH GROUP INC", ticker: "UNH", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -20000, changePercent: null, changeType: "EXIT" },
+    { issuer: "V F CORP", ticker: "VFC CALL", sector: "未分类", value: 0, weight: 0, shares: 0, shareChange: -1500000, changePercent: null, changeType: "EXIT" },
+  ],
+};
+
+export const portfolioSnapshotsByManager: Record<string, PortfolioSnapshot> = {
+  berkshire: portfolioSnapshot,
+  scion: scionPortfolioSnapshot,
+};
+
+export function getPortfolioSnapshotForManager(slug: string) {
+  return portfolioSnapshotsByManager[slug];
+}
+
+export function getPortfolioSnapshotByCik(cik: string) {
+  return Object.values(portfolioSnapshotsByManager).find((snapshot) => snapshot.cik === cik);
+}

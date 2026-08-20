@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "../app/lib/portfolio-data";
+import { getPortfolioSnapshotByCik, portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "../app/lib/portfolio-data";
 
 type FilingRow = {
   id: string; manager: string; manager_short: string; cik: string;
@@ -43,7 +43,7 @@ async function initializeSchema() {
   await db.prepare("PRAGMA optimize").run();
 }
 
-export async function getLatestPortfolio(): Promise<PortfolioSnapshot> {
+export async function getLatestPortfolio(cik = portfolioSnapshot.cik): Promise<PortfolioSnapshot> {
   await ensurePortfolioSchema();
   const db = database();
   const latest = await db.prepare(`
@@ -53,12 +53,15 @@ export async function getLatestPortfolio(): Promise<PortfolioSnapshot> {
       filings.position_count, filings.new_count, filings.added_count,
       filings.reduced_count, filings.exit_count, filings.unchanged_count
     FROM filings JOIN funds ON funds.id = filings.fund_id
+    WHERE funds.cik = ?
     ORDER BY filings.report_date DESC LIMIT 1
-  `).first<FilingRow>();
+  `).bind(cik).first<FilingRow>();
 
   if (!latest) {
-    await savePortfolio(portfolioSnapshot, "persistent-demo");
-    return getLatestPortfolio();
+    const builtin = getPortfolioSnapshotByCik(cik);
+    if (!builtin) throw new Error(`No portfolio snapshot is available for CIK ${cik}`);
+    await savePortfolio(builtin, "persistent-demo");
+    return getLatestPortfolio(cik);
   }
 
   const positionResult = await db.prepare(`

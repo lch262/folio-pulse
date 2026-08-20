@@ -25,8 +25,8 @@ export const managerProfiles: ManagerProfile[] = [
   },
   {
     slug: "scion", initials: "SA", name: "Scion Asset Management", nameZh: "Scion 资产管理",
-    vehicle: "逆向与事件驱动", description: "关注逆向机会、估值错配和高确信度仓位，组合变化通常具有较强信号感。",
-    tags: ["逆向", "事件驱动", "高确信度"], status: "queued", coverage: "SEC 数据排队接入",
+    vehicle: "逆向与事件驱动", description: "关注逆向机会、估值错配和高确信度仓位。当前已接入其最新公开 SEC 13F，并明确标注期权方向。",
+    tags: ["逆向", "事件驱动", "高确信度"], status: "live", coverage: "持仓、期权方向与季度变化已接入",
   },
   {
     slug: "pershing-square", initials: "PS", name: "Pershing Square Capital Management", nameZh: "潘兴广场",
