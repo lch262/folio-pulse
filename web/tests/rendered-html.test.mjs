@@ -20,8 +20,23 @@ test("renders the FolioPulse dashboard", async () => {
   assert.match(html, /持仓与变化/);
   assert.match(html, /仅看变动/);
   assert.match(html, /本季持仓量/);
-  assert.match(html, /调仓周期与持仓量交互已启用/);
+  assert.match(html, /多页面导航已启用/);
   assert.match(html, /导入快照/);
   assert.match(html, /SEC 13F/);
   assert.doesNotMatch(html, /Your site is taking shape|SkeletonPreview/);
 });
+
+for (const [path, heading, description] of [
+  ["/holdings", "完整持仓", "查看伯克希尔 13F 的完整持仓、市值、股数和季度变化。"],
+  ["/changes", "季度调仓", "按新建、增持、减持和清仓查看伯克希尔最新季度资金动作。"],
+  ["/methodology", "数据说明", "了解 FolioPulse 如何读取 SEC 13F、比较季度持仓并解释数据时效。"],
+]) {
+  test(`renders ${path} with route-specific metadata`, async () => {
+    const response = await render(path);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, new RegExp(heading));
+    assert.match(html, new RegExp(description));
+    assert.doesNotMatch(html, /folio-pulse-social\.png/);
+  });
+}

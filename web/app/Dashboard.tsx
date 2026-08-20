@@ -1,6 +1,8 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import Link from "next/link";
+import SiteHeader from "./components/SiteHeader";
 import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "./lib/portfolio-data";
 
 const filters: Array<{ key: "ALL" | ChangeType; label: string }> = [
@@ -33,9 +35,8 @@ function previousShares(shares: number, shareChange: number) {
   return Math.max(0, shares - shareChange);
 }
 
-function Icon({ name }: { name: "pulse" | "search" | "arrow" | "calendar" }) {
+function Icon({ name }: { name: "search" | "arrow" | "calendar" }) {
   const paths = {
-    pulse: <path d="M3 12h4l2.2-6 4.4 12 2.2-6H21" />,
     search: <><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></>,
     arrow: <><path d="M5 12h14" /><path d="m14 7 5 5-5 5" /></>,
     calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>,
@@ -65,6 +66,11 @@ export default function Dashboard() {
         if (!active || !payload?.data) return;
         setSnapshot(payload.data);
         setStorageStatus(payload.meta?.status === "persistent" ? "持久化快照" : "演示快照");
+        const requestedTicker = new URLSearchParams(window.location.search).get("ticker");
+        if (requestedTicker) {
+          setQuery(requestedTicker);
+          setExpandedKey(requestedTicker);
+        }
       })
       .catch(() => active && setStorageStatus("演示快照"));
     return () => { active = false; };
@@ -148,17 +154,10 @@ export default function Dashboard() {
 
   return (
     <main>
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="FolioPulse 首页">
-          <span className="brand-mark"><Icon name="pulse" /></span>
-          <span>Folio<span>Pulse</span></span>
-        </a>
-        <nav aria-label="主导航"><a className="active" href="#overview">概览</a><a href="#holdings">持仓</a><a href="#changes">调仓</a><a href="#method">数据说明</a></nav>
-        <div className="header-actions">
+      <SiteHeader active="overview" actions={<>
           <input ref={importInput} className="import-input" type="file" accept="application/json,.json" onChange={importSnapshot} />
           <button className="watch-button" type="button" disabled={importState === "uploading"} onClick={() => importInput.current?.click()}>{importState === "uploading" ? "导入中…" : "导入快照"}</button>
-        </div>
-      </header>
+        </>} />
 
       <section className="hero" id="top">
         <div className="eyebrow"><span className="live-dot" /> SEC 13F 追踪 · {storageStatus}</div>
@@ -196,7 +195,7 @@ export default function Dashboard() {
               const detail = item.changePercent === null ? money(item.value) : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`;
               return <button type="button" className="signal-action" onClick={() => focusPosition(item.ticker)} key={`${item.ticker}-${index}`}><span className={`signal-icon ${signalClass}`}>{signalMark}</span><span className="signal-copy"><strong>{changeLabels[item.changeType]} {item.ticker}</strong><small>{item.issuer} · {detail}</small></span><span className="signal-chevron">›</span></button>;
             })}</div>
-            <a className="text-link" href="#holdings">查看完整调仓记录 <Icon name="arrow" /></a>
+            <Link className="text-link" href="/changes">查看完整调仓记录 <Icon name="arrow" /></Link>
           </article>
         </div>
 
@@ -231,9 +230,9 @@ export default function Dashboard() {
         </section>
       </section>
 
-      <section className="method" id="method"><div><span className="section-kicker">数据口径</span><h2>来自原始文件，不靠二手摘要</h2></div><p>FolioPulse 读取 SEC EDGAR 的原始 13F-HR 与信息表，按 CUSIP 聚合后比较相邻季度。13F 最长可滞后 45 天，页面只用于研究，不构成投资建议。</p></section>
+      <section className="method" id="method"><div><span className="section-kicker">数据口径</span><h2>来自原始文件，不靠二手摘要</h2></div><div><p>FolioPulse 读取 SEC EDGAR 的原始 13F-HR 与信息表，按 CUSIP 聚合后比较相邻季度。13F 最长可滞后 45 天，页面只用于研究，不构成投资建议。</p><Link className="method-read-more" href="/methodology">查看完整数据说明 →</Link></div></section>
       {importMessage && <div className={`import-toast ${importState}`} role="status"><strong>{importState === "success" ? "导入完成" : importState === "error" ? "导入未完成" : "正在处理"}</strong><span>{importMessage}</span><button type="button" aria-label="关闭提示" onClick={() => setImportMessage("")}>×</button></div>}
-      <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.4 · 调仓周期与持仓量交互已启用</span></footer>
+      <footer><span>FolioPulse · 让机构持仓更易读</span><span>v0.5 · 多页面导航已启用</span></footer>
     </main>
   );
 }
