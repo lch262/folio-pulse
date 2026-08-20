@@ -40,3 +40,19 @@ for (const [path, heading, description] of [
     assert.doesNotMatch(html, /folio-pulse-social\.png/);
   });
 }
+
+for (const [path, title, description] of [
+  ["/holding/AAPL", "AAPL 持仓未变｜FolioPulse", "APPLE INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+  ["/holding/GOOGL", "GOOGL 增持｜FolioPulse", "ALPHABET INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+]) {
+  test(`renders ${path} with record-specific metadata`, async () => {
+    const response = await render(path);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, new RegExp(title));
+    assert.match(html, new RegExp(description));
+    assert.match(html, /持股数量变化/);
+    assert.match(html, /复制页面链接/);
+    assert.doesNotMatch(html, /folio-pulse-social\.png/);
+  });
+}

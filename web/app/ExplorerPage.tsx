@@ -55,6 +55,19 @@ export default function ExplorerPage({ view }: { view: "holdings" | "changes" })
       });
   }, [filter, query, snapshot, sort, view]);
 
+  function exportCsv() {
+    const headers = ["ticker", "issuer", "change_type", "previous_report_date", "report_date", "previous_shares", "current_shares", "share_change", "change_percent", "value_usd_billion", "weight_percent"];
+    const rows = positions.map((item) => [item.ticker, item.issuer, item.changeType, snapshot.previousReportDate, snapshot.reportDate, previousShares(item), item.shares, item.shareChange, item.changePercent ?? "", item.value, item.weight]);
+    const escapeCell = (value: string | number) => `"${String(value).replaceAll('"', '""')}"`;
+    const csv = `\uFEFF${[headers, ...rows].map((row) => row.map(escapeCell).join(",")).join("\r\n")}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `folio-pulse-${view}-${snapshot.reportDate}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   return <main className="route-page">
     <SiteHeader active={view} actions={<Link className="watch-button route-home-button" href="/">返回概览</Link>} />
     <section className="route-hero">
@@ -77,6 +90,7 @@ export default function ExplorerPage({ view }: { view: "holdings" | "changes" })
         <label className="route-search"><span>搜索</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="公司名称或股票代码" aria-label="搜索持仓" /></label>
         <label><span>变化类型</span><select value={filter} onChange={(event) => setFilter(event.target.value as "ALL" | ChangeType)}><option value="ALL">全部</option><option value="NEW">新建仓</option><option value="ADDED">增持</option><option value="REDUCED">减持</option><option value="EXIT">清仓</option><option value="UNCHANGED">未变</option></select></label>
         <label><span>排序方式</span><select value={sort} onChange={(event) => setSort(event.target.value as "value" | "shares" | "change")}><option value="value">当前市值</option><option value="shares">本季持仓量</option><option value="change">变化量绝对值</option></select></label>
+        <button className="export-button" type="button" onClick={exportCsv} disabled={positions.length === 0}>导出 CSV</button>
         <div className="explorer-count"><strong>{positions.length}</strong><span>个结果</span></div>
       </div>
 
@@ -94,7 +108,7 @@ export default function ExplorerPage({ view }: { view: "holdings" | "changes" })
             <div><span>上季持仓</span><strong>{compactShares(previousShares(item))}</strong><small>{dateLabel(snapshot.previousReportDate)}</small></div>
             <div className={item.shareChange > 0 ? "gain" : item.shareChange < 0 ? "loss" : ""}><span>股份变化</span><strong>{signedShares(item.shareChange)}</strong><small>{item.changePercent === null ? changeLabels[item.changeType] : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`}</small></div>
             <div><span>本季持仓</span><strong>{compactShares(item.shares)}</strong><small>{dateLabel(snapshot.reportDate)}</small></div>
-            <Link href={`/?ticker=${encodeURIComponent(item.ticker)}#holdings`}>回到仪表盘查看 ↗</Link>
+            <div className="position-detail-links"><Link href={`/holding/${encodeURIComponent(item.ticker)}`}>打开独立详情页 →</Link><Link href={`/?ticker=${encodeURIComponent(item.ticker)}#holdings`}>仪表盘定位 ↗</Link></div>
           </div>}
         </article>;
       })}</div>
