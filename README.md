@@ -1,10 +1,23 @@
 # FolioPulse
 
-FolioPulse 是一个 SEC 13F 数据引擎与可视化仪表盘。V0.05 输入基金的
-CIK，从 SEC EDGAR 找到最近两份**原始** `13F-HR`，并可自动定位最新 filing
-的 Information Table XML，输出标准化持仓 JSON、季度持仓变化并监控新的 filing。
+> [在线试用 FolioPulse](https://folio-pulse-dashboard.lch262.chatgpt.site/) · [提交问题或建议](https://github.com/lch262/folio-pulse/issues/new/choose) · [参与产品讨论](https://github.com/lch262/folio-pulse/discussions)
+
+FolioPulse 是一个 SEC 13F 数据引擎与可视化仪表盘。它从 SEC EDGAR 读取机构最近两份
+**原始** `13F-HR`，生成标准化持仓、季度变化和可浏览的投资人档案。目前已接入伯克希尔
+与 Scion 的真实公开快照。
 
 `13F-HR/A` 修订申报会被忽略，避免把修订文件误当成新的季度。
+
+## 公开试用
+
+无需安装即可打开[在线仪表盘](https://folio-pulse-dashboard.lch262.chatgpt.site/)。建议重点体验：
+
+- 从投资人中心切换伯克希尔与 Scion，核对报告期和提交日期；
+- 搜索持仓，并按新建、增持、减持和清仓筛选季度动作；
+- 打开单项持仓详情，检查跳转、移动端显示和数据解释是否清楚；
+- 对不准确的数据、难理解的文案或希望增加的机构提出建议。
+
+发现问题请使用[反馈模板](https://github.com/lch262/folio-pulse/issues/new/choose)；想讨论产品方向、机构优先级或界面方案，请前往 [Discussions](https://github.com/lch262/folio-pulse/discussions)。提交反馈时不要粘贴 Token、密码、邮箱验证码或其他敏感信息。
 
 ## 要求
 
