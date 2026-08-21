@@ -63,6 +63,7 @@ for (const [path, title, description, visibleCopy] of [
     assert.match(html, new RegExp(title));
     assert.match(html, new RegExp(description));
     assert.match(html, new RegExp(visibleCopy));
+    assert.match(html, /季度增减持折线图/);
     assert.doesNotMatch(html, /folio-pulse-social\.png/);
   });
 }

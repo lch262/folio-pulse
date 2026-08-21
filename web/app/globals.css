@@ -477,6 +477,41 @@ h1,.hero h1,.route-hero h1,.manager-directory-hero h1,.manager-profile-title h1,
 .manager-profile-avatar { width:88px; height:88px; border:0; border-radius:24px; background:#fff; color:var(--forest); box-shadow:0 8px 30px rgba(0,0,0,.06); }
 .manager-profile-avatar svg { width:34px; height:34px; }
 .manager-profile-lede { color:#424245; font-family:inherit; font-weight:500; letter-spacing:-.02em; }
+.manager-change-chart { margin:18px 0; padding:30px; border-radius:24px; background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.04),0 12px 40px rgba(0,0,0,.035); }
+.manager-chart-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+.manager-chart-heading .section-kicker { display:flex; align-items:center; gap:7px; }
+.manager-chart-heading h2 { margin:8px 0 5px; color:#1d1d1f; font-size:clamp(25px,3vw,34px); letter-spacing:-.04em; }
+.manager-chart-heading p { margin:0; color:#86868b; font-size:12px; }
+.chart-metric-tabs { display:flex; gap:3px; padding:3px; border-radius:12px; background:#f5f5f7; }
+.chart-metric-tabs button { min-width:82px; padding:9px 12px; border:0; border-radius:9px; background:transparent; color:#6e6e73; font:650 12px/1 inherit; cursor:pointer; }
+.chart-metric-tabs button.selected { background:#fff; color:#1d1d1f; box-shadow:0 1px 5px rgba(0,0,0,.08); }
+.manager-chart-layout { display:grid; grid-template-columns:minmax(0,1fr) 205px; gap:22px; margin-top:22px; }
+.manager-chart-canvas { min-width:0; padding:8px 6px 0 0; overflow-x:auto; }
+.manager-chart-canvas svg { display:block; width:100%; min-width:620px; height:auto; overflow:visible; }
+.chart-grid-line { stroke:#e8e8ed; stroke-width:1; stroke-dasharray:4 7; }
+.chart-zero-line { stroke:#a1a1a6; stroke-width:1.25; }
+.chart-axis-label,.chart-ticker-label { fill:#86868b; font:600 10px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif; }
+.chart-ticker-label { fill:#48484a; font-size:9px; }
+.chart-trend-line { fill:none; stroke:#0071e3; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 4px 7px rgba(0,113,227,.16)); }
+.chart-point { outline:none; cursor:pointer; }
+.chart-point-halo { fill:#fff; stroke:#d2d2d7; stroke-width:1; transition:r .16s ease,stroke .16s ease; }
+.chart-point:hover .chart-point-halo,.chart-point:focus .chart-point-halo,.chart-point.selected .chart-point-halo { stroke:#0071e3; }
+.chart-positive-marker { stroke:#34c759; stroke-width:3; }
+.chart-negative-marker { stroke:#ff3b30; stroke-width:3; }
+.manager-chart-detail { display:flex; flex-direction:column; min-width:0; padding:20px; border-radius:18px; background:#f5f5f7; }
+.manager-chart-detail>strong { margin-top:15px; color:#1d1d1f; font-size:25px; letter-spacing:-.04em; }
+.manager-chart-detail>p { min-height:38px; margin:5px 0 16px; color:#6e6e73; font-size:11px; line-height:1.55; }
+.chart-action-badge { align-self:flex-start; padding:5px 8px; border-radius:7px; background:#e8e8ed; color:#48484a; font-size:9px; font-weight:800; letter-spacing:.04em; }
+.chart-action-badge.new { background:#e8f3ff; color:#0066cc; }.chart-action-badge.added { background:#eaf8ed; color:#208637; }.chart-action-badge.reduced { background:#fff4e2; color:#a85e00; }.chart-action-badge.exit { background:#ffebe9; color:#c5241b; }
+.chart-detail-value { display:flex; align-items:center; gap:5px; padding:13px 0; border-top:1px solid #dedee3; border-bottom:1px solid #dedee3; font-size:18px; font-weight:750; font-variant-numeric:tabular-nums; }
+.chart-detail-value.positive { color:#248a3d; }.chart-detail-value.negative { color:#d70015; }
+.manager-chart-detail dl { margin:auto 0 0; }
+.manager-chart-detail dl>div { display:flex; justify-content:space-between; gap:8px; padding-top:11px; color:#86868b; font-size:10px; }
+.manager-chart-detail dd { margin:0; color:#48484a; font-weight:700; font-variant-numeric:tabular-nums; text-align:right; }
+.manager-chart-legend { display:flex; align-items:center; flex-wrap:wrap; gap:13px; margin-top:10px; padding-top:17px; border-top:1px solid #ececef; color:#6e6e73; font-size:10px; }
+.manager-chart-legend span { display:flex; align-items:center; gap:5px; font-weight:650; }
+.manager-chart-legend i { width:7px; height:7px; border-radius:50%; }
+.manager-chart-legend small { margin-left:auto; color:#86868b; }
 .manager-disclosure { border:0; border-radius:14px; background:#fff7e6; color:#6e5b22; }
 .manager-disclosure strong { color:#8a6500; }
 .manager-live-metrics article { position:relative; min-height:150px; }
@@ -504,4 +539,11 @@ h1,.hero h1,.route-hero h1,.manager-directory-hero h1,.manager-profile-title h1,
   .manager-filter { width:100%; }
   .manager-filter button { flex:1 0 auto; }
   .manager-profile-avatar { border-radius:18px; }
+  .manager-change-chart { margin:12px 0; padding:20px 16px; border-radius:20px; }
+  .manager-chart-heading { flex-direction:column; gap:15px; }
+  .chart-metric-tabs { width:100%; }
+  .chart-metric-tabs button { flex:1; }
+  .manager-chart-layout { grid-template-columns:1fr; }
+  .manager-chart-detail { min-height:210px; }
+  .manager-chart-legend small { width:100%; margin-left:0; line-height:1.5; }
 }
