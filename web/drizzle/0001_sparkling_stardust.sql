@@ -1,0 +1,1 @@
+ALTER TABLE `filings` ADD `previous_report_date` text DEFAULT '' NOT NULL;

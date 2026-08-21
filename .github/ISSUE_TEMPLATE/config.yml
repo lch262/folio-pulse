@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 产品讨论与开放想法
+    url: https://github.com/lch262/folio-pulse/discussions
+    about: 讨论产品方向、机构优先级和还未成形的建议
+  - name: 在线试用 FolioPulse
+    url: https://folio-pulse-dashboard.lch262.chatgpt.site/
+    about: 先体验当前发布版本
