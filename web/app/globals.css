@@ -316,6 +316,19 @@ footer { max-width:1360px; margin:auto; padding:25px clamp(24px,5vw,80px) 38px; 
   .manager-live-metrics { grid-template-columns:repeat(2,1fr); }.manager-live-grid,.manager-queued-content { grid-template-columns:1fr; }.manager-portfolio-toolbar { align-items:stretch; flex-direction:column; }.manager-portfolio-list>a { grid-template-columns:60px minmax(150px,1fr) 75px 40px; }.manager-portfolio-list>a>span:nth-of-type(2) { display:none; }
   .manager-more>div:last-child { grid-template-columns:1fr 1fr; }
 }
+
+.manager-disclosure {
+  max-width:780px;
+  margin:18px 0 0 117px;
+  padding:14px 16px;
+  border-left:3px solid var(--gold);
+  background:rgba(181,139,65,.08);
+  color:#5d655f;
+  font-size:12px;
+  line-height:1.7;
+}
+.manager-disclosure strong { margin-right:10px; color:var(--forest); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
+@media (max-width: 700px) { .manager-disclosure { margin-left:0; } }
 @media (max-width:580px) {
   .site-header { height:66px; }
   .watch-button { padding:8px 12px; font-size:12px; }

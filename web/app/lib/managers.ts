@@ -10,6 +10,7 @@ export type ManagerProfile = {
   tags: string[];
   status: ManagerStatus;
   coverage: string;
+  disclosure?: string;
 };
 
 export const managerProfiles: ManagerProfile[] = [
@@ -17,6 +18,18 @@ export const managerProfiles: ManagerProfile[] = [
     slug: "berkshire", initials: "BH", name: "Berkshire Hathaway", nameZh: "伯克希尔·哈撒韦",
     vehicle: "长期价值投资", description: "以长期持有、高质量企业和集中组合著称。当前已接入最新 SEC 13F 持仓快照。",
     tags: ["价值", "集中持仓", "长期"], status: "live", coverage: "持仓与季度变化已接入",
+  },
+  {
+    slug: "ark", initials: "ARK", name: "ARK Investment Management", nameZh: "ARK Invest（木头姐）",
+    vehicle: "颠覆式创新与成长", description: "由 Cathie Wood（木头姐）创立，以颠覆式创新主题和高频主动调仓著称。当前已接入 ARK 最新公开 SEC 13F。",
+    tags: ["创新成长", "科技", "主动交易"], status: "live", coverage: "ARK 公开申报持仓与季度变化已接入",
+    disclosure: "本页展示季度 SEC 13F 机构申报，不是实时交易记录；SPACEX 是私有证券的页面显示标识，并非交易所股票代码。",
+  },
+  {
+    slug: "hh-international", initials: "H&H", name: "H&H International Investment", nameZh: "H&H International（段永平相关）",
+    vehicle: "长期价值与集中持仓", description: "公开数据来自 H&H International Investment 的 SEC 13F；该主体常被用于观察段永平相关的美股配置。",
+    tags: ["价值", "集中持仓", "中概股"], status: "live", coverage: "H&H 公开申报主体持仓与季度变化已接入",
+    disclosure: "本页展示 H&H International Investment 的机构申报，不代表段永平个人全部资产、其他账户或实时持仓。",
   },
   {
     slug: "bridgewater", initials: "BW", name: "Bridgewater Associates", nameZh: "桥水基金",

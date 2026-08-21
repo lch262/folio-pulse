@@ -39,6 +39,7 @@ export default async function ManagerPage({ params }: PageProps) {
       <div className="manager-profile-breadcrumb"><a href="/managers">投资人中心</a><span>/</span><strong>{manager.nameZh}</strong></div>
       <div className="manager-profile-title"><span className="manager-profile-avatar">{manager.initials}</span><div><span className={`manager-status ${manager.status}`}>{isLive ? "真实数据已接入" : "数据接入中"}</span><p className="section-kicker">{manager.vehicle}</p><h1>{manager.nameZh}</h1><small>{manager.name}</small></div></div>
       <p className="manager-profile-lede">{manager.description}</p>
+      {manager.disclosure ? <p className="manager-disclosure"><strong>数据边界</strong>{manager.disclosure}</p> : null}
       <div className="manager-tags manager-profile-tags">{manager.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
     </section>
 

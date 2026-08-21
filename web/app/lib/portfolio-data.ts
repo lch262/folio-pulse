@@ -1,3 +1,6 @@
+import arkSnapshotData from "../data/ark-portfolio.json";
+import hhSnapshotData from "../data/hh-portfolio.json";
+
 export type ChangeType = "NEW" | "ADDED" | "REDUCED" | "EXIT" | "UNCHANGED";
 
 export type Position = {
@@ -108,9 +111,21 @@ export const scionPortfolioSnapshot: PortfolioSnapshot = {
   ],
 };
 
+export const arkPortfolioSnapshot: PortfolioSnapshot = {
+  ...(arkSnapshotData as unknown as PortfolioSnapshot),
+  managerShort: "ARK Invest（木头姐）",
+};
+
+export const hhPortfolioSnapshot: PortfolioSnapshot = {
+  ...(hhSnapshotData as unknown as PortfolioSnapshot),
+  managerShort: "H&H International（段永平相关）",
+};
+
 export const portfolioSnapshotsByManager: Record<string, PortfolioSnapshot> = {
   berkshire: portfolioSnapshot,
   scion: scionPortfolioSnapshot,
+  ark: arkPortfolioSnapshot,
+  "hh-international": hhPortfolioSnapshot,
 };
 
 export function getPortfolioSnapshotForManager(slug: string) {
