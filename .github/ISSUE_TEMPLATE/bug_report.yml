@@ -1,0 +1,56 @@
+name: 问题报告
+description: 报告页面错误、数据异常、跳转失败或显示问题
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢帮助改进 FolioPulse。请勿填写 Token、密码、验证码或其他敏感信息。
+  - type: dropdown
+    id: area
+    attributes:
+      label: 问题类型
+      options:
+        - 页面或跳转
+        - 持仓或季度变化数据
+        - 投资人档案
+        - 手机或平板显示
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: 页面链接
+      placeholder: https://folio-pulse-dashboard.lch262.chatgpt.site/...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 请按顺序说明点击或输入了什么。
+      placeholder: |
+        1. 打开……
+        2. 点击……
+        3. 出现……
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: data_context
+    attributes:
+      label: 数据核验信息（可选）
+      description: 若涉及数据，请提供机构、代码或 CUSIP、报告期及 SEC 链接。
+  - type: input
+    id: environment
+    attributes:
+      label: 设备与浏览器
+      placeholder: Windows 11 / Chrome 版本，或 iPhone / Safari
