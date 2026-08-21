@@ -1,5 +1,9 @@
 import arkSnapshotData from "../data/ark-portfolio.json";
+import appaloosaSnapshotData from "../data/appaloosa-portfolio.json";
+import bridgewaterSnapshotData from "../data/bridgewater-portfolio.json";
+import duquesneSnapshotData from "../data/duquesne-portfolio.json";
 import hhSnapshotData from "../data/hh-portfolio.json";
+import pershingSnapshotData from "../data/pershing-portfolio.json";
 
 export type ChangeType = "NEW" | "ADDED" | "REDUCED" | "EXIT" | "UNCHANGED";
 
@@ -121,11 +125,39 @@ export const hhPortfolioSnapshot: PortfolioSnapshot = {
   managerShort: "H&H International（段永平相关）",
 };
 
+export const bridgewaterPortfolioSnapshot: PortfolioSnapshot = {
+  ...(bridgewaterSnapshotData as unknown as PortfolioSnapshot),
+  managerShort: "桥水基金",
+};
+
+export const pershingPortfolioSnapshot: PortfolioSnapshot = {
+  ...(pershingSnapshotData as unknown as PortfolioSnapshot),
+  managerShort: "潘兴广场",
+};
+
+export const appaloosaPortfolioSnapshot: PortfolioSnapshot = {
+  ...(appaloosaSnapshotData as unknown as PortfolioSnapshot),
+  managerShort: "Appaloosa（David Tepper）",
+};
+
+const duquesneRawSnapshot = duquesneSnapshotData as unknown as PortfolioSnapshot;
+export const duquesnePortfolioSnapshot: PortfolioSnapshot = {
+  ...duquesneRawSnapshot,
+  managerShort: "Duquesne（Stanley Druckenmiller）",
+  source: "SEC 13F-HR · 申报单位校正",
+  totalValue: duquesneRawSnapshot.totalValue * 1000,
+  positions: duquesneRawSnapshot.positions.map((position) => ({ ...position, value: position.value * 1000 })),
+};
+
 export const portfolioSnapshotsByManager: Record<string, PortfolioSnapshot> = {
   berkshire: portfolioSnapshot,
   scion: scionPortfolioSnapshot,
   ark: arkPortfolioSnapshot,
   "hh-international": hhPortfolioSnapshot,
+  bridgewater: bridgewaterPortfolioSnapshot,
+  "pershing-square": pershingPortfolioSnapshot,
+  appaloosa: appaloosaPortfolioSnapshot,
+  duquesne: duquesnePortfolioSnapshot,
 };
 
 export function getPortfolioSnapshotForManager(slug: string) {

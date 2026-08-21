@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { CalendarDays, CircleDollarSign, Layers3, RefreshCw } from "lucide-react";
 import FollowManagerButton from "../../components/FollowManagerButton";
+import ManagerIcon from "../../components/ManagerIcon";
 import ManagerPortfolioExplorer from "../../components/ManagerPortfolioExplorer";
 import SiteHeader from "../../components/SiteHeader";
 import { getManager, managerProfiles } from "../../lib/managers";
@@ -37,14 +39,14 @@ export default async function ManagerPage({ params }: PageProps) {
     <SiteHeader active="managers" actions={<FollowManagerButton slug={manager.slug} />} />
     <section className="manager-profile-hero">
       <div className="manager-profile-breadcrumb"><a href="/managers">投资人中心</a><span>/</span><strong>{manager.nameZh}</strong></div>
-      <div className="manager-profile-title"><span className="manager-profile-avatar">{manager.initials}</span><div><span className={`manager-status ${manager.status}`}>{isLive ? "真实数据已接入" : "数据接入中"}</span><p className="section-kicker">{manager.vehicle}</p><h1>{manager.nameZh}</h1><small>{manager.name}</small></div></div>
+      <div className="manager-profile-title"><span className="manager-profile-avatar"><ManagerIcon slug={manager.slug} size={34} /><span className="sr-only">{manager.initials}</span></span><div><span className={`manager-status ${manager.status}`}>{isLive ? "真实数据已接入" : "数据接入中"}</span><p className="section-kicker">{manager.vehicle}</p><h1>{manager.nameZh}</h1><small>{manager.name}</small></div></div>
       <p className="manager-profile-lede">{manager.description}</p>
       {manager.disclosure ? <p className="manager-disclosure"><strong>数据边界</strong>{manager.disclosure}</p> : null}
       <div className="manager-tags manager-profile-tags">{manager.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
     </section>
 
     {snapshot ? <section className="manager-live-content">
-      <div className="manager-live-metrics"><article><span>最新报告期</span><strong>{snapshot.reportDate}</strong><small>{snapshot.filedAt} 提交</small></article><article><span>披露市值</span><strong>${snapshot.totalValue.toFixed(2)}B</strong><small>SEC 13F-HR</small></article><article><span>持仓数量</span><strong>{snapshot.positionCount}</strong><small>本季披露标的</small></article><article><span>发生变化</span><strong>{snapshot.positionCount - snapshot.changes.UNCHANGED}</strong><small>新建、增持、减持与清仓</small></article></div>
+      <div className="manager-live-metrics"><article><CalendarDays className="metric-icon" aria-hidden="true" size={19} /><span>最新报告期</span><strong>{snapshot.reportDate}</strong><small>{snapshot.filedAt} 提交</small></article><article><CircleDollarSign className="metric-icon" aria-hidden="true" size={19} /><span>披露市值</span><strong>${snapshot.totalValue.toFixed(2)}B</strong><small>{snapshot.source}</small></article><article><Layers3 className="metric-icon" aria-hidden="true" size={19} /><span>持仓数量</span><strong>{snapshot.positionCount}</strong><small>本季披露标的</small></article><article><RefreshCw className="metric-icon" aria-hidden="true" size={19} /><span>发生变化</span><strong>{snapshot.positionCount - snapshot.changes.UNCHANGED}</strong><small>新建、增持、减持与清仓</small></article></div>
       <div className="manager-live-grid">
         <article className="manager-top-holdings"><div className="manager-panel-heading"><div><span className="section-kicker">Top holdings</span><h2>前五大持仓</h2></div><a href="#manager-holdings">查看全部 →</a></div>{snapshot.positions.filter((item) => item.changeType !== "EXIT").slice(0, 5).map((item, index) => <a href={`/holding/${encodeURIComponent(item.ticker)}?manager=${encodeURIComponent(slug)}`} key={item.ticker}><span>0{index + 1}</span><strong>{item.ticker}</strong><small>{item.issuer}</small><em>{item.weight.toFixed(2)}%</em></a>)}</article>
         <article className="manager-latest-actions"><span className="section-kicker">Latest actions</span><h2>最新资金动作</h2><div>{changes.map((item) => <a href={`/holding/${encodeURIComponent(item.ticker)}?manager=${encodeURIComponent(slug)}`} key={item.ticker}><span className={`change-tag ${item.changeType.toLowerCase()}`}>{item.changeType === "ADDED" ? "增持" : item.changeType === "REDUCED" ? "减持" : item.changeType === "NEW" ? "新建仓" : "清仓"}</span><strong>{item.ticker}</strong><small>{item.shareChange > 0 ? "+" : ""}{compactShares(item.shareChange)}</small></a>)}</div><a className="manager-primary-link" href="#manager-holdings">浏览全部持仓 →</a></article>
@@ -55,7 +57,7 @@ export default async function ManagerPage({ params }: PageProps) {
       <aside><span className="section-kicker">What you can do</span><h2>先加入关注</h2><p>关注状态会保存在当前设备。数据接入后，这里会出现前十大持仓、季度调仓和单股详情入口。</p><FollowManagerButton slug={manager.slug} /></aside>
     </section>}
 
-    <section className="manager-more"><div className="manager-panel-heading"><div><span className="section-kicker">Explore network</span><h2>继续探索投资人</h2></div><a href="/managers">查看全部 →</a></div><div>{otherManagers.map((item) => <a href={`/manager/${item.slug}`} key={item.slug}><span className="manager-avatar">{item.initials}</span><strong>{item.nameZh}</strong><small>{item.vehicle}</small><em>{item.status === "live" ? "数据已接入" : "即将接入"}</em></a>)}</div></section>
+    <section className="manager-more"><div className="manager-panel-heading"><div><span className="section-kicker">Explore network</span><h2>继续探索投资人</h2></div><a href="/managers">查看全部 →</a></div><div>{otherManagers.map((item) => <a href={`/manager/${item.slug}`} key={item.slug}><span className="manager-avatar"><ManagerIcon slug={item.slug} /><span className="sr-only">{item.initials}</span></span><strong>{item.nameZh}</strong><small>{item.vehicle}</small><em>{item.status === "live" ? "数据已接入" : "即将接入"}</em></a>)}</div></section>
     <footer><span>FolioPulse · {manager.nameZh}</span><span>{manager.coverage}</span></footer>
   </main>;
 }

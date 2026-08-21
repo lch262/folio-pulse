@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- full-page navigation avoids a deployed Sites client-router stall */
 import type { Metadata } from "next";
+import { ArrowLeft, DatabaseZap } from "lucide-react";
 import SiteHeader from "../components/SiteHeader";
 import ManagerDirectory from "./ManagerDirectory";
 
@@ -10,8 +11,8 @@ export const metadata: Metadata = { title, description, openGraph: { title, desc
 
 export default function ManagersPage() {
   return <main className="route-page managers-page">
-    <SiteHeader active="managers" actions={<a className="watch-button route-home-button" href="/">返回概览</a>} />
-    <section className="manager-directory-hero"><div><span className="eyebrow"><span className="live-dot" /> Investor network</span><p className="section-kicker">机构档案库</p><h1>投资人中心</h1><p>从单一组合走向机构网络。搜索策略、关注投资人，并查看每个数据源的接入状态。</p></div><aside><strong>4 / 8</strong><span>真实数据已接入</span><small>伯克希尔、Scion、ARK 与 H&amp;H 已接入 SEC 原始快照，其余机构将按队列逐步上线。</small></aside></section>
+    <SiteHeader active="managers" actions={<a className="watch-button route-home-button" href="/"><ArrowLeft aria-hidden="true" size={15} />返回概览</a>} />
+    <section className="manager-directory-hero"><div><span className="eyebrow"><DatabaseZap aria-hidden="true" size={14} /> Investor network</span><p className="section-kicker">机构档案库</p><h1>投资人中心</h1><p>八家机构，同一个清晰界面。搜索策略、关注投资人，并查看真实季度持仓变化。</p></div><aside><strong>8 / 8</strong><span>真实数据已接入</span><small>全部机构均使用 SEC 原始申报；桥水、Appaloosa 与 Duquesne 已更新至 2026 年第二季度。</small></aside></section>
     <section className="manager-directory-content"><ManagerDirectory /></section>
     <footer><span>FolioPulse · 投资人档案网络</span><span>关注状态仅保存在当前设备</span></footer>
   </main>;
