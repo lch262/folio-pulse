@@ -1,0 +1,240 @@
+{
+  "manager": "H&H International Investment, LLC",
+  "managerShort": "H&H International Investment, LLC",
+  "cik": "0001759760",
+  "previousReportDate": "2026-03-31",
+  "reportDate": "2026-06-30",
+  "filedAt": "2026-08-14",
+  "source": "SEC 13F-HR",
+  "totalValue": 19.100584155,
+  "positionCount": 18,
+  "changes": {
+    "NEW": 1,
+    "ADDED": 3,
+    "REDUCED": 7,
+    "EXIT": 2,
+    "UNCHANGED": 7
+  },
+  "positions": [
+    {
+      "issuer": "APPLE INC",
+      "ticker": "AAPL",
+      "sector": "未分类",
+      "value": 7.841281858,
+      "weight": 41.052576,
+      "shares": 27098707,
+      "shareChange": -1846900,
+      "changePercent": -6.3806,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "BERKSHIRE HATHAWAY INC DEL",
+      "ticker": "BRK.B",
+      "sector": "未分类",
+      "value": 4.618447581,
+      "weight": 24.179614,
+      "shares": 9229696,
+      "shareChange": 81900,
+      "changePercent": 0.8953,
+      "changeType": "ADDED"
+    },
+    {
+      "issuer": "PDD HOLDINGS INC",
+      "ticker": "PDD",
+      "sector": "未分类",
+      "value": 1.90868533,
+      "weight": 9.992811,
+      "shares": 25022094,
+      "shareChange": 5273800,
+      "changePercent": 26.7051,
+      "changeType": "ADDED"
+    },
+    {
+      "issuer": "TESLA INC",
+      "ticker": "TSLA",
+      "sector": "未分类",
+      "value": 1.42179624,
+      "weight": 7.443732,
+      "shares": 3380400,
+      "shareChange": -28500,
+      "changePercent": -0.836,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "NVIDIA CORPORATION",
+      "ticker": "NVDA",
+      "sector": "未分类",
+      "value": 1.256700261,
+      "weight": 6.579381,
+      "shares": 6280675,
+      "shareChange": -7563100,
+      "changePercent": -54.6318,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "ALPHABET INC",
+      "ticker": "GOOG",
+      "sector": "未分类",
+      "value": 0.695565438,
+      "weight": 3.641592,
+      "shares": 1968600,
+      "shareChange": -1737400,
+      "changePercent": -46.8807,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "OCCIDENTAL PETE CORP",
+      "ticker": "OXY",
+      "sector": "未分类",
+      "value": 0.498401055,
+      "weight": 2.60935,
+      "shares": 10261500,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "MICROSOFT CORP",
+      "ticker": "MSFT",
+      "sector": "未分类",
+      "value": 0.281294382,
+      "weight": 1.4727,
+      "shares": 754100,
+      "shareChange": -261900,
+      "changePercent": -25.7776,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "CREDO TECHNOLOGY GROUP HOLDI",
+      "ticker": "CRDO",
+      "sector": "未分类",
+      "value": 0.19069134,
+      "weight": 0.998353,
+      "shares": 701200,
+      "shareChange": -50000,
+      "changePercent": -6.656,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "UNITEDHEALTH GROUP INC",
+      "ticker": "UNH",
+      "sector": "未分类",
+      "value": 0.166085748,
+      "weight": 0.869532,
+      "shares": 399600,
+      "shareChange": -201800,
+      "changePercent": -33.555,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "DISNEY WALT CO",
+      "ticker": "DIS",
+      "sector": "未分类",
+      "value": 0.16426025,
+      "weight": 0.859975,
+      "shares": 1706600,
+      "shareChange": 194800,
+      "changePercent": 12.8853,
+      "changeType": "ADDED"
+    },
+    {
+      "issuer": "ALIBABA GROUP HLDG LTD",
+      "ticker": "BABA",
+      "sector": "未分类",
+      "value": 0.028928372,
+      "weight": 0.151453,
+      "shares": 301400,
+      "shareChange": 301400,
+      "changePercent": null,
+      "changeType": "NEW"
+    },
+    {
+      "issuer": "CIRCLE INTERNET GROUP INC",
+      "ticker": "CRCL",
+      "sector": "未分类",
+      "value": 0.012526,
+      "weight": 0.065579,
+      "shares": 200000,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "PALANTIR TECHNOLOGIES INC",
+      "ticker": "PLTR",
+      "sector": "未分类",
+      "value": 0.0070002,
+      "weight": 0.036649,
+      "shares": 60000,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "SYNOPSYS INC",
+      "ticker": "SNPS",
+      "sector": "未分类",
+      "value": 0.0044607,
+      "weight": 0.023354,
+      "shares": 10000,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "SNOWFLAKE INC",
+      "ticker": "SNOW",
+      "sector": "未分类",
+      "value": 0.002545,
+      "weight": 0.013324,
+      "shares": 10000,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "TEMPUS AI INC",
+      "ticker": "TEM",
+      "sector": "未分类",
+      "value": 0.0011586,
+      "weight": 0.006066,
+      "shares": 20000,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "INNODATA INC",
+      "ticker": "INOD",
+      "sector": "未分类",
+      "value": 0.0007558,
+      "weight": 0.003957,
+      "shares": 10000,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "CROWDSTRIKE HLDGS INC",
+      "ticker": "CRWD",
+      "sector": "未分类",
+      "value": 0.0,
+      "weight": 0.0,
+      "shares": 0,
+      "shareChange": -10000,
+      "changePercent": null,
+      "changeType": "EXIT"
+    },
+    {
+      "issuer": "TAIWAN SEMICONDUCTOR MANUFAC",
+      "ticker": "TSM",
+      "sector": "未分类",
+      "value": 0.0,
+      "weight": 0.0,
+      "shares": 0,
+      "shareChange": -151200,
+      "changePercent": null,
+      "changeType": "EXIT"
+    }
+  ]
+}

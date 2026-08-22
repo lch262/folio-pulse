@@ -1,0 +1,152 @@
+{
+  "manager": "Pershing Square Capital Management, L.P.",
+  "managerShort": "Pershing Square Capital Management, L.P.",
+  "cik": "0001336528",
+  "previousReportDate": "2025-12-31",
+  "reportDate": "2026-03-31",
+  "filedAt": "2026-05-15",
+  "source": "SEC 13F-HR",
+  "totalValue": 13.714299861,
+  "positionCount": 11,
+  "changes": {
+    "NEW": 1,
+    "ADDED": 1,
+    "REDUCED": 6,
+    "EXIT": 1,
+    "UNCHANGED": 3
+  },
+  "positions": [
+    {
+      "issuer": "BROOKFIELD CORP",
+      "ticker": "BN",
+      "sector": "未分类",
+      "value": 2.415946008,
+      "weight": 17.616255,
+      "shares": 59697208,
+      "shareChange": -1705881,
+      "changePercent": -2.7782,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "AMAZON COM INC",
+      "ticker": "AMZN",
+      "sector": "未分类",
+      "value": 2.385104083,
+      "weight": 17.391366,
+      "shares": 11451981,
+      "shareChange": 1844157,
+      "changePercent": 19.1943,
+      "changeType": "ADDED"
+    },
+    {
+      "issuer": "UBER TECHNOLOGIES INC",
+      "ticker": "UBER",
+      "sector": "未分类",
+      "value": 2.154934398,
+      "weight": 15.713047,
+      "shares": 29958771,
+      "shareChange": -248963,
+      "changePercent": -0.8242,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "MICROSOFT CORP",
+      "ticker": "MSFT",
+      "sector": "未分类",
+      "value": 2.092970053,
+      "weight": 15.261224,
+      "shares": 5654078,
+      "shareChange": 5654078,
+      "changePercent": null,
+      "changeType": "NEW"
+    },
+    {
+      "issuer": "RESTAURANT BRANDS INTL INC",
+      "ticker": "QSR",
+      "sector": "未分类",
+      "value": 1.673501194,
+      "weight": 12.2026,
+      "shares": 22645483,
+      "shareChange": -221290,
+      "changePercent": -0.9677,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "META PLATFORMS INC",
+      "ticker": "META",
+      "sector": "未分类",
+      "value": 1.522358404,
+      "weight": 11.100519,
+      "shares": 2660861,
+      "shareChange": -12708,
+      "changePercent": -0.4753,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "HOWARD HUGHES HOLDINGS INC",
+      "ticker": "HHH",
+      "sector": "未分类",
+      "value": 1.192581569,
+      "weight": 8.695898,
+      "shares": 18852064,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "SEAPORT ENTMT GROUP INC",
+      "ticker": "SEG",
+      "sector": "未分类",
+      "value": 0.107910794,
+      "weight": 0.786849,
+      "shares": 5023780,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "ALPHABET INC",
+      "ticker": "GOOGL",
+      "sector": "未分类",
+      "value": 0.08942172,
+      "weight": 0.652033,
+      "shares": 311726,
+      "shareChange": -5852145,
+      "changePercent": -94.9427,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "HERTZ GLOBAL HLDGS INC",
+      "ticker": "HTZ",
+      "sector": "未分类",
+      "value": 0.070261595,
+      "weight": 0.512324,
+      "shares": 15241127,
+      "shareChange": 0,
+      "changePercent": 0.0,
+      "changeType": "UNCHANGED"
+    },
+    {
+      "issuer": "ALPHABET INC",
+      "ticker": "GOOG",
+      "sector": "未分类",
+      "value": 0.009310043,
+      "weight": 0.067886,
+      "shares": 32376,
+      "shareChange": -645921,
+      "changePercent": -95.2269,
+      "changeType": "REDUCED"
+    },
+    {
+      "issuer": "HILTON WORLDWIDE HLDGS INC",
+      "ticker": "HLT",
+      "sector": "未分类",
+      "value": 0.0,
+      "weight": 0.0,
+      "shares": 0,
+      "shareChange": -3028664,
+      "changePercent": null,
+      "changeType": "EXIT"
+    }
+  ]
+}

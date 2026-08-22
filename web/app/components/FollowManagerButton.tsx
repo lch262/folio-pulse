@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check, Heart } from "lucide-react";
 
 const storageKey = "folio-pulse-followed-managers";
 
@@ -24,5 +25,5 @@ export default function FollowManagerButton({ slug }: { slug: string }) {
     setFollowed(values.has(slug));
   }
 
-  return <button className={followed ? "watch-button followed" : "watch-button"} type="button" aria-pressed={followed} onClick={toggle}>{followed ? "已关注" : "关注机构"}</button>;
+  return <button className={followed ? "watch-button followed" : "watch-button"} type="button" aria-pressed={followed} onClick={toggle}>{followed ? <Check aria-hidden="true" size={15} /> : <Heart aria-hidden="true" size={15} />}{followed ? "已关注" : "关注机构"}</button>;
 }

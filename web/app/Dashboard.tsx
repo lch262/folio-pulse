@@ -1,6 +1,8 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { ArrowRight, CalendarDays, Search } from "lucide-react";
+import ManagerIcon from "./components/ManagerIcon";
 import SiteHeader from "./components/SiteHeader";
 import { managerProfiles } from "./lib/managers";
 import { portfolioSnapshot, type ChangeType, type PortfolioSnapshot } from "./lib/portfolio-data";
@@ -33,15 +35,6 @@ function dateLabel(value: string) {
 
 function previousShares(shares: number, shareChange: number) {
   return Math.max(0, shares - shareChange);
-}
-
-function Icon({ name }: { name: "search" | "arrow" | "calendar" }) {
-  const paths = {
-    search: <><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></>,
-    arrow: <><path d="M5 12h14" /><path d="m14 7 5 5-5 5" /></>,
-    calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>,
-  };
-  return <svg viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>;
 }
 
 export default function Dashboard() {
@@ -158,14 +151,14 @@ export default function Dashboard() {
           <div className="filing-card">
             <div><span>最新报告期</span><strong>{snapshot.reportDate}</strong></div>
             <div><span>提交日期</span><strong>{snapshot.filedAt}</strong></div>
-            <div className="filing-source"><Icon name="calendar" /><span>{snapshot.source}<small>CIK {snapshot.cik}</small></span></div>
+            <div className="filing-source"><CalendarDays aria-hidden="true" size={20} /><span>{snapshot.source}<small>CIK {snapshot.cik}</small></span></div>
           </div>
         </div>
       </section>
 
       <section className="home-manager-network">
         <div className="home-manager-heading"><div><span className="section-kicker">Investor network</span><h2>追踪更多投资人</h2><p>从伯克希尔开始，把不同投资策略放进同一个机构网络。</p></div><a href="/managers">打开投资人中心 →</a></div>
-        <div className="home-manager-grid">{managerProfiles.slice(0, 4).map((manager) => <a href={`/manager/${manager.slug}`} key={manager.slug}><span className="manager-avatar">{manager.initials}</span><div><small>{manager.vehicle}</small><strong>{manager.nameZh}</strong><em>{manager.status === "live" ? "真实数据已接入" : "即将接入"}</em></div><span className="home-manager-arrow">→</span></a>)}</div>
+        <div className="home-manager-grid">{managerProfiles.slice(0, 4).map((manager) => <a href={`/manager/${manager.slug}`} key={manager.slug}><span className="manager-avatar"><ManagerIcon slug={manager.slug} /><span className="sr-only">{manager.initials}</span></span><div><small>{manager.vehicle}</small><strong>{manager.nameZh}</strong><em>{manager.status === "live" ? "真实数据已接入" : "即将接入"}</em></div><ArrowRight className="home-manager-arrow" aria-hidden="true" size={17} /></a>)}</div>
       </section>
 
       <section className="dashboard-shell" id="overview">
@@ -192,12 +185,12 @@ export default function Dashboard() {
               const detail = item.changePercent === null ? money(item.value) : `${item.changePercent > 0 ? "+" : ""}${item.changePercent.toFixed(2)}%`;
               return <a className="signal-action" href={`/holding/${encodeURIComponent(item.ticker)}`} key={`${item.ticker}-${index}`}><span className={`signal-icon ${signalClass}`}>{signalMark}</span><span className="signal-copy"><strong>{changeLabels[item.changeType]} {item.ticker}</strong><small>{item.issuer} · {detail}</small></span><span className="signal-chevron">›</span></a>;
             })}</div>
-            <a className="text-link" href="/changes">查看完整调仓记录 <Icon name="arrow" /></a>
+            <a className="text-link" href="/changes">查看完整调仓记录 <ArrowRight aria-hidden="true" size={16} /></a>
           </article>
         </div>
 
         <section className="panel holdings-panel" id="holdings">
-          <div className="holdings-heading"><div><span className="section-kicker">完整明细</span><h2>持仓与变化</h2><p className="holdings-period">比较 {dateLabel(snapshot.previousReportDate)} → {dateLabel(snapshot.reportDate)} · 于 {dateLabel(snapshot.filedAt)} 披露</p></div><label className="search-box"><Icon name="search" /><input aria-label="搜索公司或代码" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索公司或代码" /></label></div>
+          <div className="holdings-heading"><div><span className="section-kicker">完整明细</span><h2>持仓与变化</h2><p className="holdings-period">比较 {dateLabel(snapshot.previousReportDate)} → {dateLabel(snapshot.reportDate)} · 于 {dateLabel(snapshot.filedAt)} 披露</p></div><label className="search-box"><Search aria-hidden="true" size={16} /><input aria-label="搜索公司或代码" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索公司或代码" /></label></div>
           <div className="holdings-toolbar">
             <div className="filter-row" role="tablist" aria-label="持仓变化筛选">{filters.map((item) => <button key={item.key} className={filter === item.key ? "selected" : ""} onClick={() => setFilter(item.key)} type="button">{item.label}{item.key !== "ALL" && <span>{snapshot.changes[item.key]}</span>}</button>)}</div>
             <div className="table-tools">

@@ -49,7 +49,12 @@ for (const [path, heading, description] of [
 for (const [path, title, description, visibleCopy] of [
   ["/manager/berkshire", "伯克希尔·哈撒韦｜FolioPulse", "Berkshire Hathaway：以长期持有、高质量企业和集中组合著称。当前已接入最新 SEC 13F 持仓快照。", "前五大持仓"],
   ["/manager/scion", "Scion 资产管理｜FolioPulse", "Scion Asset Management：关注逆向机会、估值错配和高确信度仓位。当前已接入其最新公开 SEC 13F，并明确标注期权方向。", "PLTR PUT"],
-  ["/manager/bridgewater", "桥水基金｜FolioPulse", "Bridgewater Associates：从跨资产和宏观周期视角观察机构配置，适合与价值型组合进行对照。", "原始文件正在排队接入"],
+  ["/manager/ark", "ARK Invest（木头姐）｜FolioPulse", "ARK Investment Management：由 Cathie Wood（木头姐）创立，以颠覆式创新主题和高频主动调仓著称。当前已接入 ARK 最新公开 SEC 13F。", "TSLA"],
+  ["/manager/hh-international", "H&amp;H International（段永平相关）｜FolioPulse", "H&amp;H International Investment：公开数据来自 H&amp;H International Investment 的 SEC 13F；该主体常被用于观察段永平相关的美股配置。", "不代表段永平个人全部资产"],
+  ["/manager/bridgewater", "桥水基金｜FolioPulse", "Bridgewater Associates：从跨资产和宏观周期视角观察机构配置。当前已接入 Bridgewater 最新公开 SEC 13F。", "SPY"],
+  ["/manager/pershing-square", "潘兴广场｜FolioPulse", "Pershing Square Capital Management：以少量核心仓位和主动参与公司价值提升为特点。当前已接入 SEC 最新可用公开 13F。", "BN"],
+  ["/manager/appaloosa", "Appaloosa（David Tepper）｜FolioPulse", "Appaloosa LP：关注市场错价、周期机会与资本结构变化。当前已接入 Appaloosa LP 最新公开 SEC 13F。", "AMZN"],
+  ["/manager/duquesne", "Duquesne（Stanley Druckenmiller）｜FolioPulse", "Duquesne Family Office：结合宏观判断与公司选择。当前已接入 Duquesne 最新公开 SEC 13F 和期权方向。", "申报单位校正"],
 ]) {
   test(`renders ${path} with manager-specific metadata`, async () => {
     const response = await render(path);
@@ -58,6 +63,7 @@ for (const [path, title, description, visibleCopy] of [
     assert.match(html, new RegExp(title));
     assert.match(html, new RegExp(description));
     assert.match(html, new RegExp(visibleCopy));
+    assert.match(html, /季度增减持折线图/);
     assert.doesNotMatch(html, /folio-pulse-social\.png/);
   });
 }
@@ -66,6 +72,12 @@ for (const [path, title, description] of [
   ["/holding/AAPL", "AAPL 持仓未变｜FolioPulse", "APPLE INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
   ["/holding/GOOGL", "GOOGL 增持｜FolioPulse", "ALPHABET INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
   ["/holding/PLTR%20PUT?manager=scion", "PLTR PUT 新建仓｜FolioPulse", "PALANTIR TECHNOLOGIES INC：2025-06-30 至 2025-09-30 的持仓量、变化量与披露市值。"],
+  ["/holding/TSLA?manager=ark", "TSLA 减持｜FolioPulse", "Tesla Inc：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+  ["/holding/AAPL?manager=hh-international", "AAPL 减持｜FolioPulse", "APPLE INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+  ["/holding/SPY?manager=bridgewater", "SPY 增持｜FolioPulse", "STATE STR SPDR S&amp;P 500 ETF T：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+  ["/holding/MSFT?manager=pershing-square", "MSFT 新建仓｜FolioPulse", "MICROSOFT CORP：2025-12-31 至 2026-03-31 的持仓量、变化量与披露市值。"],
+  ["/holding/AMZN?manager=appaloosa", "AMZN 增持｜FolioPulse", "AMAZON COM INC：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
+  ["/holding/NTRA?manager=duquesne", "NTRA 增持｜FolioPulse", "Natera Inc：2026-03-31 至 2026-06-30 的持仓量、变化量与披露市值。"],
 ]) {
   test(`renders ${path} with record-specific metadata`, async () => {
     const response = await render(path);

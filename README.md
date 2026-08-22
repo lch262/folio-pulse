@@ -3,8 +3,9 @@
 > [在线试用 FolioPulse](https://folio-pulse-dashboard.lch262.chatgpt.site/) · [提交问题或建议](https://github.com/lch262/folio-pulse/issues/new/choose) · [参与产品讨论](https://github.com/lch262/folio-pulse/discussions)
 
 FolioPulse 是一个 SEC 13F 数据引擎与可视化仪表盘。它从 SEC EDGAR 读取机构最近两份
-**原始** `13F-HR`，生成标准化持仓、季度变化和可浏览的投资人档案。目前已接入伯克希尔
-与 Scion 的真实公开快照。
+**原始** `13F-HR`，生成标准化持仓、季度变化和可浏览的投资人档案。目前已接入伯克希尔、
+Scion、ARK Invest（木头姐）、H&H International（段永平相关）、桥水、潘兴广场、
+Appaloosa 与 Duquesne 的真实公开快照。
 
 `13F-HR/A` 修订申报会被忽略，避免把修订文件误当成新的季度。
 
@@ -12,7 +13,7 @@ FolioPulse 是一个 SEC 13F 数据引擎与可视化仪表盘。它从 SEC EDGA
 
 无需安装即可打开[在线仪表盘](https://folio-pulse-dashboard.lch262.chatgpt.site/)。建议重点体验：
 
-- 从投资人中心切换伯克希尔与 Scion，核对报告期和提交日期；
+- 从投资人中心切换八家机构，核对各自报告期和提交日期；
 - 搜索持仓，并按新建、增持、减持和清仓筛选季度动作；
 - 打开单项持仓详情，检查跳转、移动端显示和数据解释是否清楚；
 - 对不准确的数据、难理解的文案或希望增加的机构提出建议。
@@ -184,3 +185,6 @@ npm run dev
 - [x] 管理员 JSON 导入界面与动态调仓信号
 - [x] 多机构档案、按 CIK 隔离读取与 Scion 真实 13F 快照（V0.08）
 - [x] 机构持仓搜索、动作筛选与机构专属单项详情
+- [x] ARK 与 H&H 最新公开 13F 快照、独立档案与数据边界说明（V0.09）
+- [x] 八家机构全量接入与 Apple 风格扁平化界面（V0.10）
+- [x] 八家机构独立季度增减持折线图、指标切换与持仓交互明细（V0.11）
